@@ -2,6 +2,8 @@
 
 An Arc-style browser built on Chromium (via Electron), with Chrome extension support, built-in ad/tracker blocking and a private, on-device wellbeing tracker.
 
+**Website & downloads: [tryvalkyrie.vercel.app](https://tryvalkyrie.vercel.app)**
+
 ## Download
 
 Get the latest installer from **[Releases](https://github.com/anmol110923/valkyrie/releases/latest)**:
@@ -107,3 +109,14 @@ assets/            app icon (icon.svg source, icon.png, icon.icns). Rebuild with
 - To-do list in the sidebar and on the new tab page
 - Wellbeing: daily limits per site, focus mode, break reminders
 - Accountability tracker: goals, streaks, weekly reports
+
+## Website
+
+The landing page lives in [`website/`](website) (plain HTML/CSS/JS, no build step) and is deployed to Vercel:
+
+```bash
+cd website
+npx vercel deploy --prod
+```
+
+`website/og.html` is the source of the link-preview image. Regenerate it with `npx electron scripts/build-og.js`.

@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valkyrie — The browser that gives you your time back</title>
+  <meta name="description" content="Valkyrie is a free Arc-style browser built on Chromium. Vertical tabs, Chrome extensions, built-in ad blocking, one-click import from Chrome, and a private wellbeing tracker that never leaves your device." />
+  <meta name="theme-color" content="#f8f5ee" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Valkyrie — The browser that gives you your time back" />
+  <meta property="og:description" content="Vertical tabs, Chrome extensions, ad blocking and a private wellbeing tracker. Free for macOS and Windows." />
+  <meta property="og:image" content="https://tryvalkyrie.vercel.app/assets/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ========== floating nav ========== -->
+  <nav class="pill-nav" aria-label="Main">
+    <a href="#top" class="nav-logo" aria-label="Valkyrie home"><img src="assets/icon.svg" alt="" width="26" height="26" /></a>
+    <a href="#features">Features</a>
+    <a href="#wellbeing">Wellbeing</a>
+    <a href="#privacy">Privacy</a>
+    <a href="#guide">Guide</a>
+    <a href="https://github.com/anmol110923/valkyrie" class="nav-gh" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <main id="top">
+    <!-- ========== hero ========== -->
+    <section class="hero">
+      <div class="aura" aria-hidden="true">
+        <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+      </div>
+      <h1 class="hero-title reveal">The browser that<br /><em>gives you your time back.</em></h1>
+      <div class="wordmark" aria-hidden="true">Valkyrie</div>
+
+      <!-- product mockup -->
+      <div class="mock-wrap" id="mock">
+        <div class="mock" role="img" aria-label="Valkyrie browser window with sidebar tabs and the wellbeing dashboard">
+          <aside class="m-side">
+            <div class="m-lights"><i></i><i></i><i></i></div>
+            <div class="m-url"><span class="m-shield">◆ 24</span>tryvalkyrie.app<span class="m-star">★</span></div>
+            <div class="m-exts"><span></span><span></span><span></span></div>
+            <div class="m-label">Bookmarks</div>
+            <div class="m-row"><b class="fav f-gh"></b>GitHub</div>
+            <div class="m-row"><b class="fav f-fig"></b>Figma</div>
+            <div class="m-label">Tabs</div>
+            <div class="m-row active"><b class="fav f-v"></b>Wellbeing</div>
+            <div class="m-row"><b class="fav f-yt"></b>Lo-fi beats to focus</div>
+            <div class="m-row"><b class="fav f-doc"></b>Q3 Planning — Docs</div>
+            <div class="m-row"><b class="fav f-mail"></b>Inbox (3)</div>
+            <div class="m-row muted">+ New Tab</div>
+            <div class="m-today"><span>◷ Today</span><b>2h 14m</b></div>
+          </aside>
+          <div class="m-page">
+            <div class="m-head">
+              <div><div class="m-h1">Wellbeing</div><div class="m-sub">Stored only on this device</div></div>
+              <div class="m-seg"><span class="on">Day</span><span>Week</span></div>
+            </div>
+            <div class="m-stats">
+              <div><small>Screen time</small><b>2h 14m</b><em>32m less than yesterday</em></div>
+              <div><small>Sites</small><b>18</b></div>
+              <div><small>Pages</small><b>146</b></div>
+              <div><small>Most used</small><b class="sm">github.com</b></div>
+            </div>
+            <div class="m-chart">
+              <i style="--h:12%"></i><i style="--h:8%"></i><i style="--h:4%"></i><i style="--h:2%"></i><i style="--h:2%"></i><i style="--h:6%"></i>
+              <i style="--h:22%"></i><i style="--h:48%"></i><i style="--h:70%"></i><i style="--h:86%"></i><i style="--h:64%"></i><i style="--h:40%"></i>
+              <i style="--h:30%"></i><i style="--h:58%"></i><i style="--h:92%"></i><i class="now" style="--h:74%"></i><i style="--h:0%"></i><i style="--h:0%"></i>
+              <i style="--h:0%"></i><i style="--h:0%"></i><i style="--h:0%"></i><i style="--h:0%"></i><i style="--h:0%"></i><i style="--h:0%"></i>
+            </div>
+            <div class="m-sites">
+              <div><b class="fav f-gh"></b>github.com<span style="--w:100%"></span><em>48m</em></div>
+              <div><b class="fav f-yt"></b>youtube.com<span style="--w:62%"></span><em>30m</em></div>
+              <div><b class="fav f-doc"></b>docs.google.com<span style="--w:44%"></span><em>21m</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- sticky download pill -->
+    <div class="dock" id="dock">
+      <a class="btn-dark download-primary" href="#download" data-primary>Download Valkyrie for free <span class="arrow">↓</span></a>
+      <p class="dock-note" data-primary-note>Available for macOS and Windows</p>
+    </div>
+
+    <!-- ========== story steps ========== -->
+    <section class="steps" id="features">
+      <h2 class="section-title reveal">Valkyrie keeps you <em>in flow</em></h2>
+      <div class="steps-grid">
+        <ol class="step-list">
+          <li class="step active" data-step="0">
+            <span class="num">01</span>
+            <h3>A sidebar that knows when to disappear</h3>
+            <p>Vertical tabs, bookmarks and extensions live in one calm column. Press <kbd>⌘S</kbd> to hide it and get a full-width page. Touch the left edge and it slides back over the page.</p>
+          </li>
+          <li class="step" data-step="1">
+            <span class="num">02</span>
+            <h3>See where your hours actually go</h3>
+            <p>Valkyrie quietly counts real attention: the tab you're looking at, or a video that's playing. Two hours of YouTube shows up as two hours. A tab you forgot overnight adds nothing.</p>
+          </li>
+          <li class="step" data-step="2">
+            <span class="num">03</span>
+            <h3>Move in with one click</h3>
+            <p>Bring over your bookmarks, history, saved passwords, logins and extensions from Chrome, Brave, Arc, Edge or Vivaldi. Everything is there from the first minute.</p>
+          </li>
+        </ol>
+        <div class="step-visual" aria-hidden="true">
+          <div class="sv sv0 show">
+            <div class="sv-win">
+              <div class="sv-edge"></div>
+              <div class="sv-panel"><i></i><i></i><i class="a"></i><i></i><i></i></div>
+              <div class="sv-page"><span></span><span></span><span class="s"></span><span></span></div>
+            </div>
+            <div class="sv-caption"><kbd>⌘</kbd><kbd>S</kbd> to collapse · hover the edge to peek</div>
+          </div>
+          <div class="sv sv1">
+            <div class="sv-card">
+              <div class="sv-row"><b class="fav f-yt"></b><span>Lo-fi beats to focus</span><em>♪ played media</em><strong>1h 02m</strong></div>
+              <div class="sv-row"><b class="fav f-gh"></b><span>valkyrie / pull requests</span><em></em><strong>48m</strong></div>
+              <div class="sv-row"><b class="fav f-doc"></b><span>Q3 Planning — Docs</span><em></em><strong>21m</strong></div>
+              <div class="sv-row"><b class="fav f-mail"></b><span>Inbox</span><em></em><strong>9m</strong></div>
+            </div>
+            <div class="sv-caption">Your footprint · every page, every minute, on your device</div>
+          </div>
+          <div class="sv sv2">
+            <div class="sv-card import">
+              <div class="sv-from"><span class="chip">Google Chrome</span>→<span class="chip v">Valkyrie</span></div>
+              <ul>
+                <li>✓ 1,284 bookmarks</li><li>✓ 38,102 history entries</li><li>✓ 212 passwords</li><li>✓ 2,940 cookies (you stay signed in)</li><li>✓ 9 extensions</li>
+              </ul>
+            </div>
+            <div class="sv-caption">Settings → Import · takes about ten seconds</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== feature grid ========== -->
+    <section class="grid-section">
+      <h2 class="section-title reveal">Everything you expect.<br /><em>Nothing you don't.</em></h2>
+      <div class="cards">
+        <article class="card reveal"><span class="tag">Extensions</span><h3>The whole Chrome Web Store</h3><p>Click “Add to Chrome” on any extension. uBlock, Dark Reader, 1Password, Grammarly and more just work, and they update themselves.</p></article>
+        <article class="card reveal"><span class="tag">Shields</span><h3>Ads and trackers, gone</h3><p>Built-in blocking based on the EasyList and EasyPrivacy lists, with nothing to install. The shield in the URL bar shows what was stopped on each page.</p></article>
+        <article class="card reveal"><span class="tag">Passwords</span><h3>A password manager that stays home</h3><p>Valkyrie offers to save logins and fills them in one click. Passwords are encrypted with your system keychain and never synced to a server.</p></article>
+        <article class="card reveal"><span class="tag">Smart URL bar</span><h3>Finds things before you finish typing</h3><p>Suggestions come from your bookmarks and history. <kbd>⌘D</kbd> bookmarks a page, and your bookmarks sit right in the sidebar.</p></article>
+        <article class="card reveal"><span class="tag">PDF</span><h3>PDFs open right here</h3><p>A full Chromium PDF viewer with zoom, print and download. Make Valkyrie your default for PDFs and stop waiting for Preview.</p></article>
+        <article class="card reveal"><span class="tag">Built on Chromium</span><h3>Fast and familiar</h3><p>The same engine as Chrome, so every site works. Tabs restore after a restart, and shortcuts like <kbd>⌘T</kbd>, <kbd>⌘W</kbd> and <kbd>⇧⌘T</kbd> are the ones you already know.</p></article>
+      </div>
+    </section>
+
+    <!-- ========== wellbeing ========== -->
+    <section class="wellbeing" id="wellbeing">
+      <div class="wb-copy reveal">
+        <span class="eyebrow">Digital wellbeing</span>
+        <h2 class="section-title left">Your attention,<br /><em>accounted for.</em></h2>
+        <p>Open the <b>Today</b> button in the sidebar or press <kbd>⌘Y</kbd>. You get screen time by hour or by day, your top sites, how today compares with yesterday, and a searchable list of every page you visited and how long you stayed.</p>
+        <ul class="ticks">
+          <li>Counts real attention only. Idle tabs don't count, playing media does.</li>
+          <li>Each YouTube video is logged separately and marked <span class="gold">♪ played media</span>.</li>
+          <li>Plain JSON files on your Mac or PC. Pause tracking or delete a day whenever you like.</li>
+        </ul>
+      </div>
+      <div class="wb-visual reveal" aria-hidden="true">
+        <div class="ring">
+          <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="84" class="track" /><circle cx="100" cy="100" r="84" class="fill" /></svg>
+          <div class="ring-label"><b>2h 14m</b><span>today</span></div>
+        </div>
+        <div class="week">
+          <div><i style="--h:60%"></i><span>M</span></div>
+          <div><i style="--h:82%"></i><span>T</span></div>
+          <div><i style="--h:48%"></i><span>W</span></div>
+          <div><i style="--h:70%"></i><span>T</span></div>
+          <div><i style="--h:38%"></i><span>F</span></div>
+          <div><i style="--h:20%"></i><span>S</span></div>
+          <div class="now"><i style="--h:44%"></i><span>S</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== privacy ========== -->
+    <section class="privacy" id="privacy">
+      <h2 class="section-title">Private by default</h2>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span class="tog">Block ads <b class="on">On</b></span>
+          <span class="tog">Block trackers <b class="on">On</b></span>
+          <span class="tog">Screen time stays on device <b class="on">On</b></span>
+          <span class="tog">Send your history anywhere <b>Off</b></span>
+          <span class="tog">Passwords in your keychain <b class="on">On</b></span>
+          <span class="tog">Sell your data <b>Off</b></span>
+          <span class="tog">Ad profiles <b>Off</b></span>
+          <span class="tog">Block ads <b class="on">On</b></span>
+          <span class="tog">Block trackers <b class="on">On</b></span>
+          <span class="tog">Screen time stays on device <b class="on">On</b></span>
+          <span class="tog">Send your history anywhere <b>Off</b></span>
+          <span class="tog">Passwords in your keychain <b class="on">On</b></span>
+          <span class="tog">Sell your data <b>Off</b></span>
+          <span class="tog">Ad profiles <b>Off</b></span>
+        </div>
+      </div>
+      <p class="privacy-copy reveal">Valkyrie has no accounts, no servers and no analytics. Your history, screen time, bookmarks and passwords live only on your computer, in files you own. The code is open, so you can <a href="https://github.com/anmol110923/valkyrie" target="_blank" rel="noopener">check it yourself</a>.</p>
+    </section>
+
+    <!-- ========== download ========== -->
+    <section class="download" id="download">
+      <h2 class="section-title">Get Valkyrie</h2>
+      <p class="lede">Free. <span data-version>Version 0.1.0</span>. Pick the file for your computer.</p>
+      <div class="dl-grid">
+        <a class="dl" data-asset="mac-arm64" href="https://github.com/anmol110923/valkyrie/releases/download/v0.1.0/Valkyrie-0.1.0-mac-arm64.dmg">
+          <span class="os"></span>
+          <b>macOS · Apple Silicon</b>
+          <span>M1, M2, M3, M4 · .dmg</span>
+          <em data-size>117 MB</em>
+        </a>
+        <a class="dl" data-asset="mac-x64" href="https://github.com/anmol110923/valkyrie/releases/download/v0.1.0/Valkyrie-0.1.0-mac-x64.dmg">
+          <span class="os"></span>
+          <b>macOS · Intel</b>
+          <span>Macs before 2020 · .dmg</span>
+          <em data-size>124 MB</em>
+        </a>
+        <a class="dl" data-asset="win-x64" href="https://github.com/anmol110923/valkyrie/releases/download/v0.1.0/Valkyrie-0.1.0-win-x64.exe">
+          <span class="os"></span>
+          <b>Windows</b>
+          <span>Most PCs (64-bit) · .exe</span>
+          <em data-size>117 MB</em>
+        </a>
+        <a class="dl" data-asset="win-arm64" href="https://github.com/anmol110923/valkyrie/releases/download/v0.1.0/Valkyrie-0.1.0-win-arm64.exe">
+          <span class="os"></span>
+          <b>Windows on ARM</b>
+          <span>Surface Pro X, Snapdragon · .exe</span>
+          <em data-size>111 MB</em>
+        </a>
+      </div>
+      <p class="dl-help">Not sure which Mac you have? Open the Apple menu → <b>About This Mac</b>. If it says “Chip: Apple M…”, choose Apple Silicon.</p>
+    </section>
+
+    <!-- ========== guide (README) ========== -->
+    <section class="guide" id="guide">
+      <h2 class="section-title">The guide</h2>
+      <p class="lede">Everything you need, from the first install to building it yourself.</p>
+
+      <div class="guide-grid">
+        <nav class="toc" aria-label="Guide">
+          <a href="#g-install">Install</a>
+          <a href="#g-first-launch">First launch warnings</a>
+          <a href="#g-import">Import from Chrome</a>
+          <a href="#g-default">Make it your default</a>
+          <a href="#g-sidebar">Sidebar & tabs</a>
+          <a href="#g-wellbeing">Wellbeing</a>
+          <a href="#g-passwords">Passwords</a>
+          <a href="#g-extensions">Extensions & ad blocking</a>
+          <a href="#g-shortcuts">Keyboard shortcuts</a>
+          <a href="#g-data">Where your data lives</a>
+          <a href="#g-build">Build from source</a>
+          <a href="#g-faq">FAQ</a>
+        </nav>
+
+        <div class="doc">
+          <article id="g-install">
+            <h3>Install</h3>
+            <div class="tabs" data-tabs>
+              <div class="tab-buttons" role="tablist">
+                <button role="tab" aria-selected="true" data-tab="mac">macOS</button>
+                <button role="tab" aria-selected="false" data-tab="win">Windows</button>
+              </div>
+              <div class="tab-panel" data-panel="mac">
+                <ol>
+                  <li>Download the <b>.dmg</b> for your Mac (Apple Silicon or Intel).</li>
+                  <li>Open it and drag <b>Valkyrie</b> into the <b>Applications</b> folder.</li>
+                  <li>Open Valkyrie from Applications or Spotlight.</li>
+                </ol>
+              </div>
+              <div class="tab-panel" data-panel="win" hidden>
+                <ol>
+                  <li>Download the <b>.exe</b> (most PCs need <b>x64</b>).</li>
+                  <li>Run the installer, choose a folder, and finish. A desktop shortcut is created.</li>
+                  <li>Open Valkyrie from the Start menu or desktop.</li>
+                </ol>
+              </div>
+            </div>
+          </article>
+
+          <article id="g-first-launch">
+            <h3>First launch warnings</h3>
+            <p>Valkyrie isn't signed with a paid Apple or Microsoft certificate yet, so your computer asks you to confirm the first time. This happens only once.</p>
+            <div class="callout">
+              <b>macOS: “Valkyrie can't be verified”</b>
+              <p>Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>.</p>
+              <b>macOS: “Valkyrie is damaged and can't be opened”</b>
+              <p>Open Terminal, paste this, press Return, then open Valkyrie again:</p>
+              <pre><code>xattr -cr /Applications/Valkyrie.app</code><button class="copy" data-copy="xattr -cr /Applications/Valkyrie.app">Copy</button></pre>
+              <b>Windows: “Windows protected your PC”</b>
+              <p>Click <b>More info</b>, then <b>Run anyway</b>.</p>
+            </div>
+          </article>
+
+          <article id="g-import">
+            <h3>Import from Chrome (or Brave, Arc, Edge, Vivaldi)</h3>
+            <ol>
+              <li>Open <b>Settings</b> with <kbd>⌘,</kbd> or the gear at the bottom of the sidebar.</li>
+              <li>Under <b>Import</b>, choose the browser and the profile.</li>
+              <li>Tick what you want: bookmarks, history, passwords, cookies (to stay signed in) and extensions.</li>
+              <li>Click <b>Import</b>. On a Mac, click <b>Allow</b> when macOS asks to use “Chrome Safe Storage” from your Keychain. This is how Chrome protects your passwords.</li>
+            </ol>
+            <p class="note">Passwords and cookies can be imported on macOS only for now. Bookmarks, history and extensions import on every platform.</p>
+          </article>
+
+          <article id="g-default">
+            <h3>Make it your default browser</h3>
+            <ol>
+              <li>In Valkyrie, open <b>Settings → Make Valkyrie default</b>.</li>
+              <li>When macOS or Windows asks, choose <b>Valkyrie</b>.</li>
+              <li>To open PDFs in Valkyrie on a Mac, right-click any PDF in Finder → <b>Get Info</b> → <b>Open with: Valkyrie</b> → <b>Change All</b>.</li>
+            </ol>
+          </article>
+
+          <article id="g-sidebar">
+            <h3>Sidebar &amp; tabs</h3>
+            <ul>
+              <li><kbd>⌘S</kbd> or the sidebar button collapses the sidebar. Move the mouse to the left edge to peek, and move away to hide it again.</li>
+              <li>Drag tabs to reorder them. Middle-click closes a tab.</li>
+              <li><kbd>⌘D</kbd> or the ★ in the URL bar saves a bookmark. Right-click a bookmark to delete it.</li>
+              <li>The URL bar suggests pages from your bookmarks and history. Use <kbd>↑</kbd> <kbd>↓</kbd> and Return.</li>
+              <li>Your tabs come back after a restart. <kbd>⇧⌘T</kbd> reopens a closed tab.</li>
+            </ul>
+          </article>
+
+          <article id="g-wellbeing">
+            <h3>Wellbeing</h3>
+            <p>Click <b>Today</b> in the sidebar, press <kbd>⌘Y</kbd>, or type <code>valkyrie://wellbeing</code>.</p>
+            <ul>
+              <li>A second counts only when a tab is in front of you and you're active, or when it's playing audio. After 60 seconds without keyboard or mouse input, counting stops.</li>
+              <li><b>Day</b> and <b>Week</b> views show screen time by hour or day, your top sites, and a comparison with the previous day.</li>
+              <li><b>Footprint</b> lists every page with the time you opened it and how long you stayed. You can search it.</li>
+              <li>Uncheck <b>Track my activity</b> to pause tracking. You can delete a day, a week or everything.</li>
+            </ul>
+          </article>
+
+          <article id="g-passwords">
+            <h3>Passwords</h3>
+            <ul>
+              <li>Click a login field and a small Valkyrie menu shows your saved accounts for that site.</li>
+              <li>After you sign in somewhere new, Valkyrie asks whether to <b>Save</b> the password, <b>Never</b> save it for that site, or skip it for now.</li>
+              <li>View, show and delete passwords in <b>Settings → Saved passwords</b>.</li>
+              <li>Passwords are encrypted with your macOS Keychain or Windows DPAPI. They never leave your device.</li>
+            </ul>
+          </article>
+
+          <article id="g-extensions">
+            <h3>Extensions &amp; ad blocking</h3>
+            <ul>
+              <li>Click the puzzle icon in the sidebar, or go to <b>Extensions → Chrome Web Store</b>. Then click <b>Add to Chrome</b>.</li>
+              <li>Extension buttons and popups appear in the sidebar. Extensions update themselves every few hours.</li>
+              <li>Ad and tracker blocking is always on. The orange shield in the URL bar shows how many requests were blocked on the page.</li>
+              <li>Most popular extensions work. A few that rely on rare Chrome features (side panels, keyboard commands) may not yet.</li>
+            </ul>
+          </article>
+
+          <article id="g-shortcuts">
+            <h3>Keyboard shortcuts</h3>
+            <p class="note">On Windows, use <kbd>Ctrl</kbd> instead of <kbd>⌘</kbd>.</p>
+            <table class="keys">
+              <tbody>
+                <tr><td><kbd>⌘T</kbd> / <kbd>⌘W</kbd> / <kbd>⇧⌘T</kbd></td><td>New tab / close tab / reopen closed tab</td></tr>
+                <tr><td><kbd>⌘L</kbd></td><td>Focus the URL bar</td></tr>
+                <tr><td><kbd>⌘S</kbd></td><td>Toggle sidebar</td></tr>
+                <tr><td><kbd>⌘D</kbd></td><td>Bookmark this page</td></tr>
+                <tr><td><kbd>⌘Y</kbd></td><td>Wellbeing &amp; activity</td></tr>
+                <tr><td><kbd>⌘,</kbd></td><td>Settings &amp; import</td></tr>
+                <tr><td><kbd>⌘O</kbd></td><td>Open a file (PDF, HTML…)</td></tr>
+                <tr><td><kbd>⌘R</kbd> / <kbd>⇧⌘R</kbd></td><td>Reload / hard reload</td></tr>
+                <tr><td><kbd>⌘[</kbd> / <kbd>⌘]</kbd></td><td>Back / forward</td></tr>
+                <tr><td><kbd>⌘1</kbd>–<kbd>⌘9</kbd>, <kbd>⌃Tab</kbd>, <kbd>⌥⌘↑</kbd>/<kbd>↓</kbd></td><td>Switch tabs</td></tr>
+                <tr><td><kbd>⌘=</kbd> / <kbd>⌘-</kbd> / <kbd>⌘0</kbd></td><td>Zoom in / out / reset</td></tr>
+                <tr><td><kbd>⌥⌘I</kbd></td><td>Developer tools</td></tr>
+                <tr><td><kbd>⌘N</kbd></td><td>New window</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article id="g-data">
+            <h3>Where your data lives</h3>
+            <p>Everything is stored on your computer:</p>
+            <ul>
+              <li><b>macOS</b>: <code>~/Library/Application Support/Valkyrie/</code></li>
+              <li><b>Windows</b>: <code>%APPDATA%\Valkyrie\</code></li>
+            </ul>
+            <p>Inside you'll find <code>wellbeing/</code> (one JSON file per day), <code>bookmarks.json</code>, <code>history.db</code> and <code>passwords.json</code> (encrypted). Delete the folder to reset Valkyrie completely.</p>
+          </article>
+
+          <article id="g-build">
+            <h3>Build from source</h3>
+            <p>Valkyrie is built with Electron (Chromium), so you need <a href="https://nodejs.org" target="_blank" rel="noopener">Node.js</a>.</p>
+            <pre><code>git clone https://github.com/anmol110923/valkyrie.git
+cd valkyrie
+npm install
+npm start          # run from source
+npm run dist       # build Valkyrie.app
+npm run release    # build the .dmg and .exe installers</code><button class="copy" data-copy="git clone https://github.com/anmol110923/valkyrie.git && cd valkyrie && npm install && npm start">Copy</button></pre>
+            <p><code>VALKYRIE_DEBUG=1 npm start</code> logs blocked requests while you develop.</p>
+          </article>
+
+          <article id="g-faq">
+            <h3>FAQ</h3>
+            <details><summary>Is Valkyrie free?</summary><p>Yes. It's free and open source.</p></details>
+            <details><summary>Is there an Android or iPhone app?</summary><p>Not yet. Valkyrie is a desktop browser for macOS and Windows. A mobile version would be a separate app.</p></details>
+            <details><summary>Does Valkyrie send my browsing data anywhere?</summary><p>No. There are no accounts or analytics. Ad blocking downloads filter lists, and extensions update from the Chrome Web Store, just like in Chrome.</p></details>
+            <details><summary>Why does my computer warn me when I open it?</summary><p>The installers aren't signed with a paid developer certificate yet. See <a href="#g-first-launch">First launch warnings</a> for the one-time fix.</p></details>
+            <details><summary>Can I use my Chrome extensions?</summary><p>Yes, install them from the Chrome Web Store, or import them from Chrome in Settings.</p></details>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== final CTA ========== -->
+    <section class="final">
+      <div class="aura small" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span></div>
+      <img src="assets/icon.svg" alt="" width="88" height="88" class="final-icon" />
+      <h2 class="section-title">Ready to take back <em>your time?</em></h2>
+      <a class="btn-dark" href="#download" data-primary>Download Valkyrie for free <span class="arrow">↓</span></a>
+      <p class="dock-note" data-primary-note>Available for macOS and Windows</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="foot-cols">
+      <div><h4>Product</h4><a href="#features">Features</a><a href="#wellbeing">Wellbeing</a><a href="#privacy">Privacy</a><a href="#download">Download</a></div>
+      <div><h4>Guide</h4><a href="#g-install">Install</a><a href="#g-import">Import from Chrome</a><a href="#g-shortcuts">Shortcuts</a><a href="#g-faq">FAQ</a></div>
+      <div><h4>Open source</h4><a href="https://github.com/anmol110923/valkyrie" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/anmol110923/valkyrie/releases" target="_blank" rel="noopener">Release notes</a><a href="https://github.com/anmol110923/valkyrie/issues" target="_blank" rel="noopener">Report a bug</a></div>
+    </div>
+    <div class="foot-mark" aria-hidden="true">Valkyrie</div>
+    <p class="foot-legal">Made with care. <span id="year"></span> Valkyrie. Not affiliated with Google or The Browser Company. Chrome is a trademark of Google LLC.</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
