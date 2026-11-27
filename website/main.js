@@ -107,7 +107,7 @@ async function loadRelease() {
     a.addEventListener('click', () => setTimeout(() => document.getElementById('g-first-launch').scrollIntoView({ behavior: 'smooth' }), 600))
   })
   notes.forEach((n) => {
-    n.innerHTML = `${long} · ${card.querySelector('[data-size]').textContent} · <a href="#download">Other platforms</a>`
+    n.innerHTML = `${long} · ${card.querySelector('[data-size]').textContent} · <a href="#download">Other platforms</a> · <a href="#oneline">Blocked? Install with one line</a>`
   })
 })()
 

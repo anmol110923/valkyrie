@@ -243,6 +243,28 @@
         </a>
       </div>
       <p class="dl-help">Not sure which Mac you have? Open the Apple menu → <b>About This Mac</b>. If it says “Chip: Apple M…”, choose Apple Silicon.</p>
+
+      <div class="oneline" id="oneline">
+        <div class="oneline-copy">
+          <span class="eyebrow">Recommended</span>
+          <h3>Install with one line, without the security pop-ups</h3>
+          <p>Valkyrie isn't signed with a paid Apple or Microsoft certificate yet, so a downloaded installer gets blocked when you open it. Paste this into <b>Terminal</b> (Mac) or <b>PowerShell</b> (Windows) instead. It downloads the same installer from GitHub, checks its SHA-256 fingerprint, and installs Valkyrie for you. It picks Apple Silicon or Intel automatically.</p>
+        </div>
+        <div class="tabs" data-tabs>
+          <div class="tab-buttons" role="tablist">
+            <button role="tab" aria-selected="true" data-tab="mac">macOS · Terminal</button>
+            <button role="tab" aria-selected="false" data-tab="win">Windows · PowerShell</button>
+          </div>
+          <div class="tab-panel" data-panel="mac">
+            <pre><code>curl -fsSL https://tryvalkyrie.vercel.app/install.sh | bash</code><button class="copy" data-copy="curl -fsSL https://tryvalkyrie.vercel.app/install.sh | bash">Copy</button></pre>
+            <p class="oneline-note">Open Terminal with ⌘Space → “Terminal”. <a href="install.sh" target="_blank" rel="noopener">Read the script</a></p>
+          </div>
+          <div class="tab-panel" data-panel="win" hidden>
+            <pre><code>irm https://tryvalkyrie.vercel.app/install.ps1 | iex</code><button class="copy" data-copy="irm https://tryvalkyrie.vercel.app/install.ps1 | iex">Copy</button></pre>
+            <p class="oneline-note">Press Start, type “PowerShell” and open it. <a href="install.ps1" target="_blank" rel="noopener">Read the script</a></p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ========== guide (README) ========== -->
@@ -293,7 +315,14 @@
 
           <article id="g-first-launch">
             <h3>First launch warnings</h3>
-            <p>Valkyrie isn't signed with a paid Apple or Microsoft certificate yet, so your computer asks you to confirm the first time. This happens only once.</p>
+            <p>Valkyrie isn't signed with a paid Apple or Microsoft certificate yet, so a downloaded installer gets blocked when you open it.</p>
+            <p><b>Easiest fix: install with one line instead.</b> Nothing gets blocked, and updating works the same way.</p>
+            <pre><code># macOS (Terminal)
+curl -fsSL https://tryvalkyrie.vercel.app/install.sh | bash
+
+# Windows (PowerShell)
+irm https://tryvalkyrie.vercel.app/install.ps1 | iex</code><button class="copy" data-copy="curl -fsSL https://tryvalkyrie.vercel.app/install.sh | bash">Copy</button></pre>
+            <p>If you already downloaded the installer, you can get past the warning by hand:</p>
             <div class="callout">
               <b>macOS: “Valkyrie can't be verified”</b>
               <p>Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>.</p>

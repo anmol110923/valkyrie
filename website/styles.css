@@ -524,3 +524,24 @@ details p { margin: 10px 0 0; }
 .m-spaces { display: flex; justify-content: center; gap: 6px; padding-top: 6px; color: #8c8a99; font-size: 12px; }
 .m-spaces span { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; }
 .m-spaces .on { color: #9b87f5; background: rgba(155, 135, 245, 0.16); }
+
+/* ---------- one-line installer ---------- */
+.oneline {
+  margin-top: 36px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 36px;
+  align-items: center;
+  padding: 34px 36px;
+  border-radius: var(--radius);
+  background: radial-gradient(120% 120% at 0% 0%, #efe9ff 0%, var(--card) 60%);
+  box-shadow: 0 0 0 1.5px rgba(106, 79, 224, 0.35), 0 24px 50px -30px rgba(106, 79, 224, 0.45);
+}
+.oneline .eyebrow { margin-bottom: 10px; }
+.oneline h3 { margin: 0 0 10px; font: 400 30px/1.1 var(--serif); }
+.oneline p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.oneline pre { margin: 0; padding-right: 76px; }
+.oneline pre code { font-size: 14px; white-space: pre-wrap; word-break: break-all; }
+.oneline-note { margin-top: 10px !important; font-size: 13px !important; color: var(--muted) !important; }
+.oneline-note a { color: var(--violet); }
+@media (max-width: 860px) { .oneline { grid-template-columns: 1fr; padding: 26px 22px; gap: 20px; } }

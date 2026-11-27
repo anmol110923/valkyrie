@@ -9,7 +9,8 @@
     "start": "electron .",
     "icons": "electron scripts/build-icons.js",
     "dist": "electron-builder --mac dir",
-    "release": "electron-builder --mac dmg --arm64 --x64 --win nsis --x64 --publish never"
+    "release": "electron-builder --mac dmg --arm64 --x64 --win nsis --x64 --publish never && npm run checksums",
+    "checksums": "cd dist && shasum -a 256 Valkyrie-*-mac-arm64.dmg Valkyrie-*-mac-x64.dmg Valkyrie-*-win-x64.exe Valkyrie-*-win-arm64.exe > SHA256SUMS.txt"
   },
   "author": "anmol110923",
   "repository": "github:anmol110923/valkyrie",

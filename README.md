@@ -15,7 +15,23 @@ Get the latest installer from **[Releases](https://github.com/anmol110923/valkyr
 | Windows (most PCs) | `Valkyrie-…-win-x64.exe` |
 | Windows on ARM | `Valkyrie-…-win-arm64.exe` |
 
-These builds are not yet signed with a paid Apple/Microsoft certificate, so the first launch shows a warning:
+### Easiest: one-line install (no security pop-ups)
+
+```bash
+# macOS (Terminal)
+curl -fsSL https://tryvalkyrie.vercel.app/install.sh | bash
+```
+
+```powershell
+# Windows (PowerShell)
+irm https://tryvalkyrie.vercel.app/install.ps1 | iex
+```
+
+The scripts ([install.sh](website/install.sh), [install.ps1](website/install.ps1)) download the latest release from GitHub, check its SHA-256 against the release's `SHA256SUMS.txt`, and install Valkyrie. Files fetched this way aren't marked as "downloaded from the internet", so the unsigned app isn't blocked. Run the same command again to update.
+
+### Or download the installer
+
+These builds are not yet signed with a paid Apple/Microsoft certificate, so opening a downloaded installer shows a warning:
 
 - **macOS**: open the DMG and drag Valkyrie to Applications. If macOS says it "can't be verified", go to **System Settings → Privacy & Security** and click **Open Anyway**. If it says the app "is damaged", run `xattr -cr /Applications/Valkyrie.app` in Terminal and open it again.
 - **Windows**: if SmartScreen says "Windows protected your PC", click **More info → Run anyway**.
@@ -26,7 +42,7 @@ These builds are not yet signed with a paid Apple/Microsoft certificate, so the 
 npm install
 npm start          # run from source
 npm run dist       # build dist/mac-arm64/Valkyrie.app
-npm run release    # build the .dmg (Apple Silicon + Intel) and .exe installers
+npm run release    # build the .dmg (Apple Silicon + Intel) and .exe installers + dist/SHA256SUMS.txt
 ```
 
 To use Valkyrie as your default browser, build the app, move `Valkyrie.app` to /Applications, open it, and go to **Settings (⌘,) → Make Valkyrie default**.
@@ -138,5 +154,7 @@ The landing page lives in [`website/`](website) (plain HTML/CSS/JS, no build ste
 cd website
 npx vercel deploy --prod
 ```
+
+When you publish a release, upload `dist/SHA256SUMS.txt` with the installers. The one-line installers refuse to install without it.
 
 `website/og.html` is the source of the link-preview image. Regenerate it with `npx electron scripts/build-og.js`.
