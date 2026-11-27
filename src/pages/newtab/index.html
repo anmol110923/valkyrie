@@ -4,39 +4,79 @@
   <meta charset="utf-8" />
   <title>New Tab</title>
   <link rel="icon" href="valkyrie://assets/icon.svg" />
-  <style>
-    :root { --bg: #f6f4fb; --text: #1f1d26; --muted: #7a7788; --card: #fff; --accent: #6d55e0; --chip: rgba(0,0,0,.05); }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #1d1b24; --text: #ecebf2; --muted: #8c8a99; --card: #2a2733; --accent: #9b87f5; --chip: rgba(255,255,255,.07); }
-    }
-    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
-      font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
-    main { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 0 16px; }
-    #clock { font-size: 72px; font-weight: 200; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-    #greeting { margin-top: -20px; color: var(--muted); }
-    form { width: min(560px, 100%); }
-    input { width: 100%; height: 48px; padding: 0 18px; border: 0; border-radius: 14px; outline: 0; box-sizing: border-box;
-      background: var(--card); color: var(--text); font: inherit; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-    input:focus { box-shadow: 0 0 0 2px var(--accent); }
-    #today { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 34px; }
-    .chip { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 17px;
-      background: var(--chip); color: var(--text); text-decoration: none; font-size: 13px; }
-    .chip strong { font-weight: 600; }
-    .chip.main { background: var(--accent); color: #fff; }
-    .site-icon { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 4px; overflow: hidden; font-size: 10px; font-weight: 700; }
-    .site-icon img { width: 16px; height: 16px; }
-    .site-icon.letter { background: var(--accent); color: #fff; }
-  </style>
+  <link rel="stylesheet" href="valkyrie://assets/fonts.css" />
+  <link rel="stylesheet" href="newtab.css" />
 </head>
 <body>
   <main>
-    <div id="clock"></div>
-    <div id="greeting"></div>
-    <form action="https://www.google.com/search" method="get">
-      <input name="q" placeholder="Search Google" autocomplete="off" />
+    <header class="hello">
+      <div>
+        <h1 id="greeting">Hello</h1>
+        <p id="date" class="muted"></p>
+      </div>
+      <div id="clock" class="clock"></div>
+    </header>
+
+    <form id="search" class="search" action="https://www.google.com/search" method="get">
+      <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" /><path d="M10.5 10.5L14 14" /></svg>
+      <input name="q" id="q" placeholder="Search Google or type a URL" autocomplete="off" autofocus />
+      <kbd>⌘K</kbd>
     </form>
-    <nav id="today"></nav>
+
+    <section id="tiles" class="tiles"></section>
+
+    <div id="stats-block">
+      <section class="stats" id="stats"></section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Your year in browsing</h2>
+          <span class="muted" id="year-total"></span>
+        </div>
+        <div class="heat-wrap">
+          <div class="heat-days"><span>Mon</span><span>Wed</span><span>Fri</span></div>
+          <div class="heat-scroll">
+            <div class="heat-months" id="heat-months"></div>
+            <div class="heat" id="heat"></div>
+          </div>
+        </div>
+        <div class="legend"><span>Less</span><i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><span>More</span></div>
+      </section>
+
+      <div class="two">
+        <section class="card">
+          <div class="card-head"><h2>When you browse</h2><span class="muted">last 90 days</span></div>
+          <div class="hw" id="hourweek"></div>
+          <div class="hw-hours"><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>12a</span></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>Most used sites</h2><span class="muted">last 30 days</span></div>
+          <ul class="sites" id="sites"></ul>
+          <p class="empty" id="sites-empty" hidden>Browse for a bit and your top sites will show up here.</p>
+        </section>
+      </div>
+
+      <div class="two">
+        <section class="card">
+          <div class="card-head"><h2>Most visited pages</h2><span class="muted">last 30 days</span></div>
+          <ul class="pages" id="pages"></ul>
+          <p class="empty" id="pages-empty" hidden>Nothing yet.</p>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>Recently today</h2><a href="valkyrie://wellbeing/">Full footprint →</a></div>
+          <ul class="pages" id="recent"></ul>
+          <p class="empty" id="recent-empty" hidden>Your first page of the day will appear here.</p>
+        </section>
+      </div>
+    </div>
+
+    <footer class="foot">
+      <a href="valkyrie://wellbeing/">Wellbeing</a>
+      <a href="valkyrie://settings/">Settings</a>
+      <a href="valkyrie://settings/#import" id="import-link" hidden>Import from Chrome</a>
+    </footer>
   </main>
+  <div id="tip" class="tip" hidden></div>
   <script src="valkyrie://assets/common.js"></script>
   <script src="newtab.js"></script>
 </body>

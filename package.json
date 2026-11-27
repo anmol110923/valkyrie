@@ -1,7 +1,7 @@
 {
   "name": "valkyrie",
   "productName": "Valkyrie",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An Arc-style browser built on Chromium (via Electron) with Chrome extension support and built-in ad blocking.",
   "main": "src/main.js",
   "private": true,
@@ -16,43 +16,109 @@
   "build": {
     "appId": "app.valkyrie.browser",
     "productName": "Valkyrie",
-    "directories": { "output": "dist" },
-    "files": ["src/**/*", "assets/icon.png", "assets/icon.svg", "package.json"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/icon.png",
+      "assets/icon.svg",
+      "package.json"
+    ],
     "asar": true,
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "mac": {
       "icon": "assets/icon.icns",
       "category": "public.app-category.productivity",
-      "target": ["dir"],
+      "target": [
+        "dir"
+      ],
       "identity": "-",
       "hardenedRuntime": false,
       "extendInfo": {
         "CFBundleURLTypes": [
-          { "CFBundleURLName": "Web site URL", "CFBundleURLSchemes": ["http", "https"], "CFBundleTypeRole": "Viewer" }
+          {
+            "CFBundleURLName": "Web site URL",
+            "CFBundleURLSchemes": [
+              "http",
+              "https"
+            ],
+            "CFBundleTypeRole": "Viewer"
+          }
         ],
         "CFBundleDocumentTypes": [
-          { "CFBundleTypeName": "HTML document", "CFBundleTypeRole": "Viewer", "LSHandlerRank": "Alternate", "LSItemContentTypes": ["public.html", "public.xhtml"] },
-          { "CFBundleTypeName": "PDF document", "CFBundleTypeRole": "Viewer", "LSHandlerRank": "Alternate", "LSItemContentTypes": ["com.adobe.pdf"] },
-          { "CFBundleTypeName": "Image", "CFBundleTypeRole": "Viewer", "LSHandlerRank": "Alternate", "LSItemContentTypes": ["public.svg-image", "org.webmproject.webp"] }
+          {
+            "CFBundleTypeName": "HTML document",
+            "CFBundleTypeRole": "Viewer",
+            "LSHandlerRank": "Alternate",
+            "LSItemContentTypes": [
+              "public.html",
+              "public.xhtml"
+            ]
+          },
+          {
+            "CFBundleTypeName": "PDF document",
+            "CFBundleTypeRole": "Viewer",
+            "LSHandlerRank": "Alternate",
+            "LSItemContentTypes": [
+              "com.adobe.pdf"
+            ]
+          },
+          {
+            "CFBundleTypeName": "Image",
+            "CFBundleTypeRole": "Viewer",
+            "LSHandlerRank": "Alternate",
+            "LSItemContentTypes": [
+              "public.svg-image",
+              "org.webmproject.webp"
+            ]
+          }
         ],
         "NSCameraUsageDescription": "Websites you allow can use your camera.",
         "NSMicrophoneUsageDescription": "Websites you allow can use your microphone.",
         "NSLocationUsageDescription": "Websites you allow can see your location."
       }
     },
-    "dmg": { "title": "Valkyrie" },
-    "win": { "icon": "assets/icon.png" },
+    "dmg": {
+      "title": "Valkyrie"
+    },
+    "win": {
+      "icon": "assets/icon.png"
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "Valkyrie"
     },
-    "linux": { "icon": "assets/icon.png", "category": "Network;WebBrowser" },
-    "protocols": [{ "name": "Web site URL", "schemes": ["http", "https"], "role": "Viewer" }],
+    "linux": {
+      "icon": "assets/icon.png",
+      "category": "Network;WebBrowser"
+    },
+    "protocols": [
+      {
+        "name": "Web site URL",
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "role": "Viewer"
+      }
+    ],
     "fileAssociations": [
-      { "ext": ["html", "htm"], "name": "HTML document", "role": "Viewer" },
-      { "ext": "pdf", "name": "PDF document", "role": "Viewer" }
+      {
+        "ext": [
+          "html",
+          "htm"
+        ],
+        "name": "HTML document",
+        "role": "Viewer"
+      },
+      {
+        "ext": "pdf",
+        "name": "PDF document",
+        "role": "Viewer"
+      }
     ]
   },
   "license": "UNLICENSED",
@@ -63,6 +129,8 @@
     "electron-chrome-web-store": "^0.13.0"
   },
   "devDependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
     "electron": "^45.5.0",
     "electron-builder": "^26.18.0"
   }

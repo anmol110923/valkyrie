@@ -23,6 +23,18 @@ if (location.protocol === 'valkyrie:') {
     revealPassword: invoke('pw:reveal-saved'),
     deletePassword: invoke('pw:delete'),
     clearHistory: invoke('hist:clear'),
+    // dashboard + preferences
+    overview: invoke('wb:overview'),
+    prefs: invoke('st:prefs'),
+    setPref: invoke('st:set'),
+    updateSpace: invoke('st:space'),
+    deleteSpace: invoke('st:delete-space'),
+    addSpace: invoke('st:add-space'),
+    archive: invoke('st:archive'),
+    clearArchive: invoke('st:archive-clear'),
+    openUrl: invoke('st:open'),
+    openDataFolder: invoke('st:open-data-folder'),
+    clearData: invoke('st:clear-data'),
   })
 } else if (/^https?:$/.test(location.protocol)) {
   setupAutofill()

@@ -12,8 +12,11 @@ contextBridge.exposeInMainWorld('valkyrie', {
   send: (channel, ...args) => ipcRenderer.send(`ui:${channel}`, ...args),
   suggest: (q) => ipcRenderer.invoke('ui:suggest', q),
   today: () => ipcRenderer.invoke('wb:today'),
+  prefs: () => ipcRenderer.invoke('st:prefs'),
   onState: on('state'),
   onLayout: on('layout'),
   onBookmarks: on('bookmarks'),
   onFocusUrl: on('focus-url'),
+  onRename: on('rename'),
+  onToast: on('toast'),
 })

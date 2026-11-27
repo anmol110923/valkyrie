@@ -4,85 +4,197 @@
   <meta charset="utf-8" />
   <title>Settings</title>
   <link rel="icon" href="valkyrie://assets/icon.svg" />
+  <link rel="stylesheet" href="valkyrie://assets/fonts.css" />
   <link rel="stylesheet" href="settings.css" />
 </head>
 <body>
-  <main>
-    <header class="top">
-      <img src="valkyrie://assets/icon.svg" alt="" width="40" height="40" />
-      <div>
+  <div class="layout">
+    <nav class="side" aria-label="Settings sections">
+      <div class="brand"><img src="valkyrie://assets/icon.svg" alt="" width="30" height="30" /><span>Settings</span></div>
+      <a href="#general">General</a>
+      <a href="#appearance">Appearance</a>
+      <a href="#spaces">Spaces</a>
+      <a href="#tabs">Tabs</a>
+      <a href="#wellbeing">Wellbeing</a>
+      <a href="#privacy">Privacy &amp; security</a>
+      <a href="#passwords">Passwords</a>
+      <a href="#import">Import</a>
+      <a href="#downloads">Downloads</a>
+      <a href="#shortcuts">Shortcuts</a>
+      <a href="#about">About</a>
+    </nav>
+
+    <main>
+      <header class="top">
         <h1>Settings</h1>
-        <p class="sub">Valkyrie keeps everything on this device.</p>
-      </div>
-    </header>
+        <p class="muted">Valkyrie keeps everything on this device.</p>
+      </header>
 
-    <section class="card" id="default">
-      <div class="row">
-        <div>
-          <h2>Default browser</h2>
-          <p id="default-status" class="muted">Checking…</p>
+      <!-- ===== General ===== -->
+      <section id="general" class="card">
+        <h2>General</h2>
+        <div class="setting">
+          <div><b>Default browser</b><p id="default-status" class="muted">Checking…</p></div>
+          <button id="make-default" class="primary">Make default</button>
         </div>
-        <button id="make-default" class="primary">Make Valkyrie default</button>
-      </div>
-      <p id="default-note" class="note" hidden></p>
-    </section>
+        <p id="default-note" class="note" hidden></p>
+        <div class="setting">
+          <div><b>On startup</b><p class="muted">What Valkyrie opens when you launch it.</p></div>
+          <select data-pref="startup"><option value="restore">Continue where you left off</option><option value="newtab">Open a new tab</option></select>
+        </div>
+        <div class="setting">
+          <div><b>Search engine</b><p class="muted">Used in the URL bar, command bar and new tab page.</p></div>
+          <select data-pref="searchEngine" id="engines"></select>
+        </div>
+      </section>
 
-    <section class="card" id="import">
-      <h2>Import from another browser</h2>
-      <p class="muted">Bring over your bookmarks, history, saved passwords, logins (cookies) and extensions.</p>
+      <!-- ===== Appearance ===== -->
+      <section id="appearance" class="card">
+        <h2>Appearance</h2>
+        <div class="themes" role="radiogroup" aria-label="Theme">
+          <button class="theme" data-theme="system"><span class="swatch sys"></span>System</button>
+          <button class="theme" data-theme="light"><span class="swatch light"></span>Light</button>
+          <button class="theme" data-theme="dark"><span class="swatch dark"></span>Dark</button>
+        </div>
+        <p class="muted small">Tip: press <kbd>⇧⌘L</kbd> anywhere to flip between light and dark.</p>
+        <div class="setting">
+          <div><b>Collapse sidebar</b><p class="muted">Hide the sidebar; hover the left edge to peek. Shortcut <kbd>⌘S</kbd>.</p></div>
+          <label class="switch"><input type="checkbox" data-pref="sidebarCollapsed" /><span></span></label>
+        </div>
+        <div class="setting">
+          <div><b>Dashboard on new tabs</b><p class="muted">Screen-time history, heatmaps and most used pages.</p></div>
+          <label class="switch"><input type="checkbox" data-pref="newTabShowStats" /><span></span></label>
+        </div>
+      </section>
 
-      <div class="grid">
-        <label>Browser
-          <select id="browser"></select>
-        </label>
-        <label>Profile
-          <select id="profile"></select>
-        </label>
-      </div>
+      <!-- ===== Spaces ===== -->
+      <section id="spaces" class="card">
+        <div class="head-row"><h2>Spaces</h2><button id="add-space">+ New space</button></div>
+        <p class="muted">Separate worlds for work, study and life. Each has its own pinned tabs, tabs and colour. Switch with <kbd>⌃1</kbd>–<kbd>⌃9</kbd>.</p>
+        <ul id="space-list" class="space-list"></ul>
+      </section>
 
-      <fieldset class="checks">
-        <label><input type="checkbox" value="bookmarks" checked /> Bookmarks</label>
-        <label><input type="checkbox" value="history" checked /> Browsing history</label>
-        <label><input type="checkbox" value="passwords" checked /> Saved passwords</label>
-        <label><input type="checkbox" value="cookies" checked /> Stay signed in (cookies)</label>
-        <label><input type="checkbox" value="extensions" checked /> Extensions</label>
-      </fieldset>
+      <!-- ===== Tabs ===== -->
+      <section id="tabs" class="card">
+        <h2>Tabs</h2>
+        <div class="setting">
+          <div><b>Archive unused tabs</b><p class="muted">Like Arc: tabs you haven't looked at close themselves. Pinned tabs and favorites are never archived.</p></div>
+          <select data-pref="autoArchiveHours" data-number>
+            <option value="12">After 12 hours</option><option value="24">After 1 day</option><option value="72">After 3 days</option><option value="168">After 1 week</option><option value="0">Never</option>
+          </select>
+        </div>
+        <div class="head-row sub"><b>Archived tabs</b><button id="clear-archive" class="ghost">Clear archive</button></div>
+        <ul id="archive" class="list"></ul>
+        <p id="archive-empty" class="muted" hidden>Nothing archived yet.</p>
+      </section>
 
-      <p class="note">For passwords and cookies, macOS will ask you to allow access to the browser's
-        “Safe Storage” key in your Keychain. Click <b>Allow</b> (or <b>Always Allow</b>). Your passwords are
-        re-encrypted with Valkyrie's own Keychain key and never leave this Mac.</p>
+      <!-- ===== Wellbeing ===== -->
+      <section id="wellbeing" class="card">
+        <div class="head-row"><h2>Wellbeing</h2><a href="valkyrie://wellbeing/">Open dashboard →</a></div>
+        <div class="setting">
+          <div><b>Track my activity</b><p class="muted">Screen time per site and your browsing footprint, stored only on this device.</p></div>
+          <label class="switch"><input type="checkbox" id="tracking" /><span></span></label>
+        </div>
+        <div class="setting">
+          <div><b>Daily screen-time goal</b><p class="muted">The sidebar's Today bar fills up and turns orange past your goal.</p></div>
+          <select data-pref="dailyGoalMinutes" data-number>
+            <option value="0">No goal</option><option value="60">1 hour</option><option value="120">2 hours</option><option value="180">3 hours</option><option value="240">4 hours</option><option value="360">6 hours</option><option value="480">8 hours</option>
+          </select>
+        </div>
+        <div class="setting">
+          <div><b>Count me as away after</b><p class="muted">Time stops counting when you stop using the keyboard and mouse (videos with sound still count).</p></div>
+          <select data-pref="idleSeconds" data-number>
+            <option value="30">30 seconds</option><option value="60">1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option>
+          </select>
+        </div>
+      </section>
 
-      <div class="actions">
-        <button id="run-import" class="primary">Import</button>
-        <span id="import-status" class="muted"></span>
-      </div>
-      <ul id="import-result" class="result" hidden></ul>
-      <p id="no-browsers" class="muted" hidden>No Chrome, Brave, Arc, Edge, Vivaldi or Chromium profile was found on this computer.</p>
-    </section>
+      <!-- ===== Privacy ===== -->
+      <section id="privacy" class="card">
+        <h2>Privacy &amp; security</h2>
+        <div class="setting">
+          <div><b>Block ads and trackers</b><p class="muted">Built-in shields based on EasyList and EasyPrivacy.</p></div>
+          <label class="switch"><input type="checkbox" data-pref="adBlock" /><span></span></label>
+        </div>
+        <div class="setting top">
+          <div><b>Clear browsing data</b><p class="muted" id="history-count"></p>
+            <div class="checks">
+              <label><input type="checkbox" value="history" checked /> Browsing history</label>
+              <label><input type="checkbox" value="cache" checked /> Cached images and files</label>
+              <label><input type="checkbox" value="cookies" /> Cookies and site data (signs you out)</label>
+            </div>
+          </div>
+          <button id="clear-data" class="danger">Clear data</button>
+        </div>
+        <p class="muted small">Screen time and your footprint are managed on the <a href="valkyrie://wellbeing/">Wellbeing page</a>.</p>
+      </section>
 
-    <section class="card" id="passwords">
-      <div class="row">
-        <h2>Saved passwords <span class="count" id="pw-count"></span></h2>
-        <input id="pw-search" type="search" placeholder="Search sites or usernames" />
-      </div>
-      <p class="muted">Valkyrie offers to fill these when you click a login field, and asks before saving new ones.</p>
-      <table class="pw">
-        <thead><tr><th>Site</th><th>Username</th><th>Password</th><th></th></tr></thead>
-        <tbody id="pw-list"></tbody>
-      </table>
-      <p id="pw-empty" class="muted" hidden>No saved passwords yet.</p>
-    </section>
+      <!-- ===== Passwords ===== -->
+      <section id="passwords" class="card">
+        <div class="head-row"><h2>Passwords <span class="count" id="pw-count"></span></h2><input id="pw-search" type="search" placeholder="Search sites or usernames" /></div>
+        <p class="muted">Valkyrie offers to fill these on login pages and asks before saving new ones. Encrypted with your system keychain.</p>
+        <table class="pw">
+          <thead><tr><th>Site</th><th>Username</th><th>Password</th><th></th></tr></thead>
+          <tbody id="pw-list"></tbody>
+        </table>
+        <p id="pw-empty" class="muted" hidden>No saved passwords yet.</p>
+      </section>
 
-    <section class="card">
-      <h2>Privacy</h2>
-      <div class="row">
-        <p class="muted" id="history-count"></p>
-        <button id="clear-history" class="danger">Clear browsing history</button>
-      </div>
-      <p class="muted">Screen time and footprint data are managed on the <a href="valkyrie://wellbeing/">Wellbeing page</a>.</p>
-    </section>
-  </main>
+      <!-- ===== Import ===== -->
+      <section id="import" class="card">
+        <h2>Import from another browser</h2>
+        <p class="muted">Bring over bookmarks, history, saved passwords, logins (cookies) and extensions.</p>
+        <div class="grid2">
+          <label class="field">Browser <select id="browser"></select></label>
+          <label class="field">Profile <select id="profile"></select></label>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" value="bookmarks" checked /> Bookmarks</label>
+          <label><input type="checkbox" value="history" checked /> Browsing history</label>
+          <label><input type="checkbox" value="passwords" checked /> Saved passwords</label>
+          <label><input type="checkbox" value="cookies" checked /> Stay signed in (cookies)</label>
+          <label><input type="checkbox" value="extensions" checked /> Extensions</label>
+        </div>
+        <p class="note">For passwords and cookies, macOS asks you to allow access to the browser's “Safe Storage” key in your Keychain. Click <b>Allow</b>. Passwords are re-encrypted with Valkyrie's own key and never leave this computer.</p>
+        <div class="actions"><button id="run-import" class="primary">Import</button><span id="import-status" class="muted"></span></div>
+        <ul id="import-result" class="result" hidden></ul>
+        <p id="no-browsers" class="muted" hidden>No Chrome, Brave, Arc, Edge, Vivaldi or Chromium profile was found on this computer.</p>
+      </section>
 
+      <!-- ===== Downloads ===== -->
+      <section id="downloads" class="card">
+        <h2>Downloads</h2>
+        <div class="setting">
+          <div><b>Ask where to save each file</b><p class="muted">Off: files go straight to your Downloads folder.</p></div>
+          <label class="switch"><input type="checkbox" data-pref="askDownloadLocation" /><span></span></label>
+        </div>
+      </section>
+
+      <!-- ===== Shortcuts ===== -->
+      <section id="shortcuts" class="card">
+        <h2>Keyboard shortcuts</h2>
+        <p class="muted small" id="ctrl-note" hidden>On Windows, use Ctrl instead of ⌘.</p>
+        <table class="keys"><tbody id="keys"></tbody></table>
+      </section>
+
+      <!-- ===== About ===== -->
+      <section id="about" class="card about">
+        <img src="valkyrie://assets/icon.svg" alt="" width="64" height="64" />
+        <div>
+          <h2>Valkyrie <span id="version" class="muted"></span></h2>
+          <p class="muted" id="engine"></p>
+          <div class="links">
+            <a href="https://tryvalkyrie.vercel.app" data-ext>Website</a>
+            <a href="https://github.com/anmol110923/valkyrie/releases/latest" data-ext>Check for updates</a>
+            <a href="https://github.com/anmol110923/valkyrie" data-ext>Source code</a>
+            <a href="https://github.com/anmol110923/valkyrie/issues" data-ext>Report a bug</a>
+            <button id="data-folder" class="ghost">Open data folder</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" hidden></div>
   <script src="settings.js"></script>
 </body>
 </html>

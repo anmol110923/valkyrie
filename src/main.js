@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const { pathToFileURL } = require('url')
 const {
-  app, BrowserWindow, session, ipcMain, Menu, dialog, protocol, net, powerMonitor, nativeImage, clipboard,
+  app, BrowserWindow, session, ipcMain, Menu, dialog, protocol, net, powerMonitor, nativeImage, clipboard, nativeTheme, shell,
 } = require('electron')
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const { installChromeWebStore, installExtension } = require('electron-chrome-web-store')
@@ -11,7 +11,7 @@ const { ElectronBlocker } = require('@ghostery/adblocker-electron')
 
 const C = require('./constants')
 const { Tracker, dayKey } = require('./tracker')
-const { Settings, Bookmarks, History } = require('./stores')
+const { Settings, Bookmarks, History, Spaces, Archive, SEARCH_ENGINES, SPACE_COLORS } = require('./stores')
 const { Passwords } = require('./passwords')
 const chromeImport = require('./chrome-import')
 const { WindowController } = require('./window')
@@ -41,7 +41,9 @@ const blockedCounts = new Map()
 
 const ctx = {
   ses: null, extensions: null, tracker: null, history: null, bookmarks: null, settings: null, passwords: null,
+  spaces: null, archive: null, blocker: null,
   controllers, blockedCounts,
+  searchEngine: () => SEARCH_ENGINES[ctx.settings.get('searchEngine')] || SEARCH_ENGINES.google,
   onFocus: (c) => { lastFocused = c },
   onClosed: (c) => {
     const i = controllers.indexOf(c)
@@ -62,7 +64,7 @@ function toURL(input) {
   if (/^[a-z][a-z0-9+.-]*:\/\//i.test(s) || /^(about|data|chrome):/i.test(s)) return s
   if (/^(localhost|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/.*)?$/i.test(s)) return 'http://' + s
   if (!/\s/.test(s) && /^[^/\s]+\.[a-z]{2,}(:\d+)?(\/.*)?$/i.test(s)) return 'https://' + s
-  return C.SEARCH_URL + encodeURIComponent(s)
+  return ctx.searchEngine().url + encodeURIComponent(s)
 }
 
 function current() {
@@ -85,12 +87,7 @@ function saveSessionSoon() {
   saveTimer = setTimeout(saveSession, 500)
 }
 function saveSession() {
-  const data = {
-    windows: controllers.map((c) => ({
-      urls: c.tabs.map((t) => t.view.webContents.getURL() || C.NEWTAB_URL),
-      active: Math.max(0, c.tabs.findIndex((t) => t.id === c.activeId)),
-    })),
-  }
+  const data = { windows: controllers.map((c) => c.serialize()) }
   try { fs.writeFileSync(SESSION_FILE(), JSON.stringify(data, null, 2)) } catch {}
 }
 function loadSession() {
@@ -163,6 +160,83 @@ ipcMain.on('ui:bookmark-menu', (e, id) => {
     : [{ label: `Delete Folder “${found.title}”`, click: () => ctx.bookmarks.remove(id) }]
   Menu.buildFromTemplate(items).popup({ window: c.win })
 })
+// Arc-style organisation: spaces, favorites, pinned folders, split view
+const str = (v, max = 200) => (typeof v === 'string' ? v.slice(0, max) : '')
+ipcMain.on('ui:tab-menu', (e, id) => fromUI(e)?.showTabMenu(id))
+ipcMain.on('ui:item-menu', (e, id) => fromUI(e)?.showItemMenu(str(id)))
+ipcMain.on('ui:space-menu', (e, id) => fromUI(e)?.showSpaceMenu(str(id)))
+ipcMain.on('ui:open-item', (e, id) => fromUI(e)?.openItem(str(id)))
+ipcMain.on('ui:switch-space', (e, id) => fromUI(e)?.switchSpace(str(id)))
+ipcMain.on('ui:new-space', (e, name) => {
+  const c = fromUI(e)
+  if (!c) return
+  const space = ctx.spaces.createSpace(str(name, 40).trim() || 'New Space')
+  c.switchSpace(space.id)
+})
+ipcMain.on('ui:rename', (e, { kind, id, title } = {}) => {
+  const c = fromUI(e)
+  if (!c) return
+  if (kind === 'tab') c.renameTab(id, str(title, 120))
+  if (kind === 'node') ctx.spaces.rename(str(id), str(title, 120))
+  if (kind === 'space') ctx.spaces.updateSpace(str(id), { name: str(title, 40) })
+})
+ipcMain.on('ui:new-folder', (e, parentId) => {
+  const c = fromUI(e)
+  if (c) { const f = ctx.spaces.addFolder(c.spaceId, 'New Folder', parentId ? str(parentId) : null); if (f) c.uiWc.send('rename', { kind: 'node', id: f.id }) }
+})
+ipcMain.on('ui:toggle-folder', (e, id, open) => { if (fromUI(e)) ctx.spaces.setOpen(str(id), open) })
+ipcMain.on('ui:toggle-mute', (e, id) => fromUI(e)?.toggleMute(id))
+ipcMain.on('ui:unsplit', (e) => fromUI(e)?.unsplit())
+ipcMain.on('ui:open-palette', (e) => fromUI(e)?.openPalette())
+// drag & drop. target = { zone: 'favorites' | 'pinned' | 'today', parentId?, index }
+ipcMain.on('ui:drop', (e, drag, target) => {
+  const c = fromUI(e)
+  if (!c || !drag || !target) return
+  const index = Number.isInteger(target.index) ? target.index : -1
+  const parentId = target.parentId ? str(target.parentId) : null
+  if (drag.kind === 'tab') {
+    const tab = c.tabs.find((t) => t.id === drag.id)
+    if (!tab) return
+    if (target.zone === 'space') {
+      c.moveTabToSpace(tab.id, str(target.spaceId))
+    } else if (target.zone === 'today') {
+      if (tab.pinnedId || tab.favId) c.unpinTab(tab.id, index)
+      else c.moveTab(tab.id, index)
+    } else if (target.zone === 'pinned') {
+      if (tab.pinnedId) ctx.spaces.move(tab.pinnedId, c.spaceId, parentId, index)
+      else { if (tab.favId) { const f = tab.favId; tab.favId = null; ctx.spaces.remove(f) } c.pinTab(tab.id, parentId, index) }
+    } else if (target.zone === 'favorites') {
+      if (tab.favId) ctx.spaces.moveFavorite(tab.favId, index)
+      else { if (tab.pinnedId) { const p = tab.pinnedId; tab.pinnedId = null; ctx.spaces.remove(p) } c.favoriteTab(tab.id, index) }
+    }
+  } else if (drag.kind === 'node') {
+    const id = str(drag.id)
+    const isFav = ctx.spaces.favorites.some((f) => f.id === id)
+    const live = c.tabs.find((t) => t.pinnedId === id || t.favId === id)
+    if (target.zone === 'pinned') {
+      if (isFav) {
+        const fav = ctx.spaces.item(id)
+        ctx.spaces.remove(id)
+        const node = ctx.spaces.pin(c.spaceId, fav, parentId, index)
+        if (live && node) { live.favId = null; live.pinnedId = node.id; live.spaceId = c.spaceId }
+      } else ctx.spaces.move(id, c.spaceId, parentId, index)
+    } else if (target.zone === 'favorites') {
+      if (isFav) ctx.spaces.moveFavorite(id, index)
+      else {
+        const node = ctx.spaces.item(id)
+        if (node?.type !== 'url') return
+        ctx.spaces.remove(id)
+        const fav = ctx.spaces.addFavorite(node, index)
+        if (live && fav) { live.pinnedId = null; live.favId = fav.id }
+      }
+    } else if (target.zone === 'today') {
+      if (live) c.unpinTab(live.id, index)
+      else ctx.spaces.remove(id)
+    }
+  }
+  c.sendState()
+})
+
 ipcMain.handle('ui:suggest', (e, q) => {
   if (!fromUI(e) || typeof q !== 'string' || !q.trim()) return []
   const query = q.trim().slice(0, 200)
@@ -176,6 +250,123 @@ ipcMain.handle('ui:suggest', (e, q) => {
   }
   return out
 })
+
+// ---------- command bar (⌘K) ----------
+
+function fromPalette(e) {
+  return controllers.find((c) => c.palette && c.palette.webContents === e.sender) || null
+}
+
+const COMMANDS = [
+  { id: 'new-tab', title: 'New Tab', glyph: '+', hint: '⌘T' },
+  { id: 'new-window', title: 'New Window', glyph: '⧉', hint: '⌘N' },
+  { id: 'new-space', title: 'New Space', glyph: '✦' },
+  { id: 'toggle-sidebar', title: 'Toggle Sidebar', glyph: '◧', hint: '⌘S' },
+  { id: 'theme', title: 'Toggle Light / Dark Mode', glyph: '◐', hint: '⇧⌘L' },
+  { id: 'split', title: 'Split View with Previous Tab', glyph: '◫', hint: '⌃⇧=' },
+  { id: 'unsplit', title: 'Exit Split View', glyph: '▭' },
+  { id: 'pin', title: 'Pin Current Tab', glyph: '📌' },
+  { id: 'favorite', title: 'Add Current Tab to Favorites', glyph: '★' },
+  { id: 'bookmark', title: 'Bookmark Current Page', glyph: '☆', hint: '⌘D' },
+  { id: 'copy-url', title: 'Copy Current URL', glyph: '⎘', hint: '⇧⌘C' },
+  { id: 'reopen', title: 'Reopen Closed Tab', glyph: '↺', hint: '⇧⌘T' },
+  { id: 'wellbeing', title: 'Open Wellbeing', glyph: '◷', hint: '⌘Y' },
+  { id: 'settings', title: 'Open Settings', glyph: '⚙', hint: '⌘,' },
+  { id: 'import', title: 'Import from Chrome…', glyph: '⇣' },
+  { id: 'webstore', title: 'Get Extensions (Chrome Web Store)', glyph: '⧩' },
+  { id: 'downloads', title: 'Open Downloads Folder', glyph: '↓' },
+]
+
+ipcMain.handle('pal:query', (e, raw) => {
+  const c = fromPalette(e)
+  if (!c) return []
+  const q = str(raw, 200).trim()
+  const s = q.toLowerCase()
+  const out = []
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, '') } catch { return u } }
+  if (q) {
+    const url = toURL(q)
+    const isSearch = url.startsWith(ctx.searchEngine().url)
+    out.push({ group: 'action', type: 'open', url, title: isSearch ? `Search ${ctx.searchEngine().name} for “${q}”` : `Open ${q}`, glyph: isSearch ? '⌕' : '↗' })
+  }
+  const match = (...fields) => !s || fields.some((f) => (f || '').toLowerCase().includes(s))
+  for (const t of c.tabs) {
+    const info = c.tabInfo(t)
+    if (info.url === C.NEWTAB_URL || !match(info.title, info.url)) continue
+    const sp = t.favId ? 'Favorites' : ctx.spaces.get(t.spaceId).name
+    out.push({ group: 'tab', type: 'tab', id: t.id, title: info.title, sub: `${host(info.url)} · ${sp}`, favicon: info.favicon, url: info.url, hint: t.id === c.activeId ? 'current' : 'switch' })
+    if (out.filter((x) => x.group === 'tab').length >= (s ? 6 : 8)) break
+  }
+  if (s) {
+    for (const p of ctx.spaces.search(q, 5)) out.push({ group: 'pinned', type: 'item', id: p.id, title: p.title, sub: `${host(p.url)} · ${p.kind === 'favorite' ? 'Favorite' : p.space}`, favicon: p.favicon, url: p.url })
+    for (const sp of ctx.spaces.spaces) if (match(sp.name)) out.push({ group: 'space', type: 'space', id: sp.id, title: `Switch to ${sp.name}`, glyph: sp.icon, hint: sp.id === c.spaceId ? 'current' : '' })
+    const seen = new Set(out.map((x) => x.url))
+    for (const b of ctx.bookmarks.search(q, 5)) if (!seen.has(b.url)) { seen.add(b.url); out.push({ group: 'bookmark', type: 'open', url: b.url, title: b.title, sub: host(b.url) }) }
+    for (const h of ctx.history.search(q, 8)) if (!seen.has(h.url)) { seen.add(h.url); out.push({ group: 'history', type: 'open', url: h.url, title: h.title || h.url, sub: host(h.url) }) }
+  }
+  for (const cmd of COMMANDS) if (s ? match(cmd.title, cmd.id) : out.length < 14) out.push({ group: 'command', type: 'command', ...cmd })
+  return out.slice(0, 40)
+})
+
+ipcMain.on('pal:close', (e) => fromPalette(e)?.closePalette())
+ipcMain.on('pal:run', (e, item = {}) => {
+  const c = fromPalette(e)
+  if (!c) return
+  c.closePalette()
+  runAction(c, item)
+})
+
+function runAction(c, item) {
+  switch (item.type) {
+    case 'tab': return c.selectTab(item.id)
+    case 'item': return c.openItem(str(item.id), { newTab: !!item.newTab })
+    case 'space': return c.switchSpace(str(item.id))
+    case 'open': {
+      const url = str(item.url, 4000)
+      if (!/^(https?|file|valkyrie):/i.test(url)) return
+      const cur = c.activeTab?.view.webContents.getURL()
+      if (!item.newTab && cur === C.NEWTAB_URL) return c.navigate(url)
+      return c.createTab(url)
+    }
+    case 'command': return runCommand(c, item.id)
+  }
+}
+
+function runCommand(c, id) {
+  switch (id) {
+    case 'new-tab': return c.createTab()
+    case 'new-window': return createWindow()
+    case 'new-space': return c.uiWc.send('rename', { kind: 'new-space' })
+    case 'toggle-sidebar': return c.toggleSidebar()
+    case 'theme': return toggleTheme()
+    case 'split': {
+      const prev = c.tabs.filter((t) => t.id !== c.activeId && (t.favId || t.spaceId === c.spaceId)).sort((a, b) => b.lastActive - a.lastActive)[0]
+      return prev && c.splitWith(prev.id)
+    }
+    case 'unsplit': return c.unsplit()
+    case 'pin': return c.activeId && c.pinTab(c.activeId)
+    case 'favorite': return c.activeId && c.favoriteTab(c.activeId)
+    case 'bookmark': return c.toggleBookmark()
+    case 'copy-url': return c.copyUrl()
+    case 'reopen': return c.reopenClosedTab()
+    case 'wellbeing': return c.openSingleton(C.WELLBEING_URL)
+    case 'settings': return c.openSingleton(C.SETTINGS_URL)
+    case 'import': return c.openSingleton(C.SETTINGS_URL + '#import')
+    case 'webstore': return c.createTab(C.WEB_STORE_URL)
+    case 'downloads': return shell.openPath(app.getPath('downloads'))
+  }
+}
+
+// ---------- theme ----------
+
+function applyTheme() {
+  const t = ctx.settings.get('theme')
+  nativeTheme.themeSource = ['light', 'dark'].includes(t) ? t : 'system'
+}
+
+function toggleTheme() {
+  ctx.settings.set('theme', nativeTheme.shouldUseDarkColors ? 'light' : 'dark')
+}
 
 // ---------- valkyrie:// page + UI IPC (trusted senders only) ----------
 
@@ -231,6 +422,57 @@ handleTrusted('pw:list', () => ctx.passwords.list())
 handleTrusted('pw:reveal-saved', (id) => ctx.passwords.reveal(id)?.password ?? null)
 handleTrusted('pw:delete', (id) => { ctx.passwords.remove(id); return true })
 handleTrusted('hist:clear', () => { ctx.history.clear(); return true })
+
+// dashboard (new tab)
+handleTrusted('wb:overview', () => ({
+  ...ctx.tracker.overview(),
+  goalMinutes: ctx.settings.get('dailyGoalMinutes'),
+  favorites: ctx.spaces.favorites.map(({ id, title, url, favicon }) => ({ id, title, url, favicon })),
+  showStats: ctx.settings.get('newTabShowStats'),
+  searchEngine: ctx.searchEngine(),
+}))
+
+// preferences
+const SETTING_RULES = {
+  theme: (v) => ['system', 'light', 'dark'].includes(v),
+  searchEngine: (v) => Object.hasOwn(SEARCH_ENGINES, v),
+  startup: (v) => ['restore', 'newtab'].includes(v),
+  autoArchiveHours: (v) => [0, 12, 24, 72, 168].includes(v),
+  adBlock: (v) => typeof v === 'boolean',
+  askDownloadLocation: (v) => typeof v === 'boolean',
+  idleSeconds: (v) => [30, 60, 120, 300].includes(v),
+  dailyGoalMinutes: (v) => Number.isInteger(v) && v >= 0 && v <= 1440,
+  newTabShowStats: (v) => typeof v === 'boolean',
+  sidebarCollapsed: (v) => typeof v === 'boolean',
+}
+handleTrusted('st:prefs', () => ({
+  ...ctx.settings.all(),
+  engines: Object.fromEntries(Object.entries(SEARCH_ENGINES).map(([k, v]) => [k, v.name])),
+  version: app.getVersion(),
+  electron: process.versions.electron,
+  chrome: process.versions.chrome,
+  dataDir: app.getPath('userData'),
+  spaces: ctx.spaces.spaces.map(({ id, name, icon, color }) => ({ id, name, icon, color })),
+  colors: SPACE_COLORS,
+}))
+handleTrusted('st:set', (key, value) => {
+  if (!SETTING_RULES[key]?.(value)) throw new Error(`Invalid setting ${key}`)
+  ctx.settings.set(key, value)
+  return ctx.settings.all()
+})
+handleTrusted('st:space', (id, patch) => { ctx.spaces.updateSpace(str(id), patch || {}); return true })
+handleTrusted('st:delete-space', (id) => { const ok = ctx.spaces.deleteSpace(str(id)); if (ok) controllers.forEach((c) => c.adoptOrphans()); return ok })
+handleTrusted('st:add-space', (name) => { ctx.spaces.createSpace(str(name, 40) || 'New Space'); return true })
+handleTrusted('st:archive', () => ctx.archive.list())
+handleTrusted('st:archive-clear', () => { ctx.archive.clear(); return true })
+handleTrusted('st:open', (url) => { if (/^https?:\/\//.test(url)) currentOrNew().createTab(url) })
+handleTrusted('st:open-data-folder', () => shell.openPath(app.getPath('userData')))
+handleTrusted('st:clear-data', async (what = {}) => {
+  if (what.cache) await ctx.ses.clearCache()
+  if (what.cookies) await ctx.ses.clearStorageData({ storages: ['cookies', 'localstorage', 'indexdb', 'serviceworkers', 'cachestorage'] })
+  if (what.history) ctx.history.clear()
+  return true
+})
 
 // ---------- password autofill (called from websites; origin comes from the frame, not the page) ----------
 
@@ -288,10 +530,18 @@ function buildMenu() {
     visible: false,
     click: () => {
       const c = current()
-      if (!c || !c.tabs.length) return
-      const tab = i === 8 ? c.tabs[c.tabs.length - 1] : c.tabs[i]
+      const list = c?.tabsInSpace() || []
+      if (!list.length) return
+      const tab = i === 8 ? list[list.length - 1] : list[i]
       if (tab) c.selectTab(tab.id)
     },
+  }))
+
+  const spaceShortcuts = Array.from({ length: 9 }, (_, i) => ({
+    label: `Space ${i + 1}`,
+    accelerator: `Ctrl+${i + 1}`,
+    visible: false,
+    click: () => { const sp = ctx.spaces.spaces[i]; if (sp) current()?.switchSpace(sp.id) },
   }))
 
   const settingsItem = { label: 'Settings…', accelerator: 'CmdOrCtrl+,', click: () => currentOrNew().openSingleton(C.SETTINGS_URL) }
@@ -321,6 +571,8 @@ function buildMenu() {
         { label: 'New Window', accelerator: 'CmdOrCtrl+N', click: () => createWindow() },
         { label: 'Reopen Closed Tab', accelerator: 'CmdOrCtrl+Shift+T', click: () => current()?.reopenClosedTab() },
         { label: 'Open Location…', accelerator: 'CmdOrCtrl+L', click: () => current()?.focusUrlBar() },
+        { label: 'Command Bar…', accelerator: 'CmdOrCtrl+K', click: () => currentOrNew().openPalette() },
+        { label: 'Copy URL', accelerator: 'CmdOrCtrl+Shift+C', click: () => current()?.copyUrl() },
         {
           label: 'Open File…',
           accelerator: 'CmdOrCtrl+O',
@@ -344,6 +596,9 @@ function buildMenu() {
       label: 'View',
       submenu: [
         { label: 'Toggle Sidebar', accelerator: 'CmdOrCtrl+S', click: () => current()?.toggleSidebar() },
+        { label: 'Toggle Light / Dark Mode', accelerator: 'CmdOrCtrl+Shift+L', click: () => toggleTheme() },
+        { label: 'Split View with Previous Tab', accelerator: 'Ctrl+Shift+=', click: () => { const c = current(); if (c) runCommand(c, 'split') } },
+        { label: 'Exit Split View', accelerator: 'Ctrl+Shift+-', click: () => current()?.unsplit() },
         { type: 'separator' },
         { label: 'Reload', accelerator: 'CmdOrCtrl+R', click: withTab((wc) => wc.reload()) },
         { label: 'Hard Reload', accelerator: 'CmdOrCtrl+Shift+R', click: withTab((wc) => wc.reloadIgnoringCache()) },
@@ -371,6 +626,8 @@ function buildMenu() {
       label: 'Bookmarks',
       submenu: [
         { label: 'Bookmark This Page', accelerator: 'CmdOrCtrl+D', click: () => current()?.toggleBookmark() },
+        { label: 'Pin Tab', accelerator: 'CmdOrCtrl+Shift+D', click: () => { const c = current(); if (c?.activeId) c.pinTab(c.activeId) } },
+        { label: 'Add Tab to Favorites', click: () => { const c = current(); if (c?.activeId) c.favoriteTab(c.activeId) } },
       ],
     },
     {
@@ -381,6 +638,11 @@ function buildMenu() {
         { label: 'Next Tab ', accelerator: 'Alt+CmdOrCtrl+Down', click: () => current()?.cycleTab(1) },
         { label: 'Previous Tab ', accelerator: 'Alt+CmdOrCtrl+Up', click: () => current()?.cycleTab(-1) },
         ...tabShortcuts,
+        { type: 'separator' },
+        { label: 'Next Space', accelerator: 'Ctrl+Alt+Right', click: () => current()?.cycleSpace(1) },
+        { label: 'Previous Space', accelerator: 'Ctrl+Alt+Left', click: () => current()?.cycleSpace(-1) },
+        { label: 'New Space', click: () => current()?.uiWc.send('rename', { kind: 'new-space' }) },
+        ...spaceShortcuts,
       ],
     },
     {
@@ -427,7 +689,8 @@ async function enableAdblock(ses) {
     const blocker = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetch, {
       path: cache, read: fs.promises.readFile, write: fs.promises.writeFile,
     })
-    blocker.enableBlockingInSession(ses)
+    ctx.blocker = blocker
+    if (ctx.settings.get('adBlock')) blocker.enableBlockingInSession(ses)
     blocker.on('request-blocked', (request) => {
       const id = request.tabId
       if (typeof id !== 'number' || id < 0) return
@@ -459,7 +722,7 @@ function setupPagesProtocol(ses) {
 
 function startTracking() {
   setInterval(() => {
-    const idle = powerMonitor.getSystemIdleTime() >= C.IDLE_SECONDS
+    const idle = powerMonitor.getSystemIdleTime() >= (ctx.settings.get('idleSeconds') || C.IDLE_SECONDS)
     const entries = []
     for (const c of controllers) {
       if (c.win.isDestroyed()) continue
@@ -476,6 +739,46 @@ function startTracking() {
   setInterval(() => ctx.tracker.flush(), 15000)
 }
 
+// ---------- auto-archive (Arc: unpinned tabs close themselves after a while) ----------
+
+function archiveIdleTabs() {
+  const hours = ctx.settings.get('autoArchiveHours')
+  if (!hours) return
+  const cutoff = Date.now() - hours * 3600 * 1000
+  for (const c of controllers) {
+    const victims = c.tabs.filter((t) => {
+      const wc = t.view.webContents
+      return !t.pinnedId && !t.favId && t.id !== c.activeId && t.lastActive < cutoff && !wc.isCurrentlyAudible() && wc.getURL() !== C.NEWTAB_URL
+    })
+    if (!victims.length) continue
+    ctx.archive.add(victims.map((t) => {
+      const info = c.tabInfo(t)
+      return { url: info.url, title: info.title, favicon: info.favicon, space: ctx.spaces.get(t.spaceId).name }
+    }))
+    for (const t of victims) c.closeTab(t.id)
+  }
+}
+
+// ---------- downloads ----------
+
+function setupDownloads(ses) {
+  ses.on('will-download', (_e, item) => {
+    if (!ctx.settings.get('askDownloadLocation')) {
+      const dir = app.getPath('downloads')
+      const base = item.getFilename()
+      let target = path.join(dir, base)
+      const ext = path.extname(base)
+      for (let i = 1; fs.existsSync(target); i++) target = path.join(dir, `${path.basename(base, ext)} (${i})${ext}`)
+      item.setSavePath(target)
+    }
+    item.once('done', (_ev, state) => {
+      if (state !== 'completed') return
+      current()?.toast(`Downloaded ${path.basename(item.getSavePath())}`)
+      if (process.platform === 'darwin') app.dock?.downloadFinished(item.getSavePath())
+    })
+  })
+}
+
 // ---------- startup ----------
 
 app.whenReady().then(async () => {
@@ -489,14 +792,28 @@ app.whenReady().then(async () => {
   ctx.history = new History(path.join(dataDir, 'history.db'))
   ctx.passwords = new Passwords(path.join(dataDir, 'passwords.json'))
   ctx.tracker = new Tracker(path.join(dataDir, 'wellbeing'))
+  ctx.spaces = new Spaces(path.join(dataDir, 'spaces.json'))
+  ctx.archive = new Archive(path.join(dataDir, 'archive.json'))
   ctx.bookmarks.onChange(() => controllers.forEach((c) => { c.sendBookmarks(); c.sendState() }))
+  ctx.spaces.onChange(() => controllers.forEach((c) => { c.unlinkMissing(); c.sendState(); c.paintBackdrop() }))
+  ctx.settings.onChange((key, value) => {
+    if (key === 'theme') applyTheme()
+    if (key === 'adBlock' && ctx.blocker) {
+      if (value) ctx.blocker.enableBlockingInSession(ctx.ses)
+      else ctx.blocker.disableBlockingInSession(ctx.ses)
+    }
+    if (key === 'sidebarCollapsed') controllers.forEach((c) => { c.layout(); c.sendLayout() })
+  })
+  applyTheme()
 
   const ses = session.fromPartition(C.PARTITION)
   ctx.ses = ses
   ses.setUserAgent(CHROME_UA)
   setupPermissions(ses)
   setupPagesProtocol(ses)
+  setupDownloads(ses)
   startTracking()
+  setInterval(archiveIdleTabs, 10 * 60 * 1000)
 
   ctx.extensions = new ElectronChromeExtensions({
     session: ses,
@@ -517,7 +834,7 @@ app.whenReady().then(async () => {
   await enableAdblock(ses)
   buildMenu()
 
-  const saved = loadSession()
+  const saved = ctx.settings.get('startup') === 'restore' ? loadSession() : []
   if (saved.length) saved.forEach((w) => createWindow(w))
   else createWindow()
 

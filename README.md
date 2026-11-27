@@ -31,66 +31,86 @@ npm run release    # build the .dmg (Apple Silicon + Intel) and .exe installers
 
 To use Valkyrie as your default browser, build the app, move `Valkyrie.app` to /Applications, open it, and go to **Settings (⌘,) → Make Valkyrie default**.
 
-## What's in the MVP
+## Features
 
-- **Vertical sidebar tabs** (Arc style): favicons, loading spinners, drag to reorder, middle-click to close
-- **Collapsible sidebar**: ⌘S (or the sidebar button) hides it, and hovering the left edge slides it back over the page
-- **Omnibox** with suggestions from your bookmarks and history (↑/↓ to pick)
-- **Bookmarks**: ⌘D or the ★ in the URL bar. They show in a collapsible sidebar section; right-click for options
-- **Import from Chrome, Brave, Arc, Edge, Vivaldi or Chromium** (Settings → Import): bookmarks, history, saved passwords, cookies (so you stay signed in) and Web Store extensions. On macOS, passwords and cookies need you to allow Keychain access once.
-- **Password manager**: offers to save logins and fills them from a small dropdown on login fields. Passwords are encrypted with the macOS Keychain (Electron `safeStorage`). Manage them in Settings.
-- **PDF viewer**: PDFs open inside Valkyrie. ⌘O opens local PDF and HTML files.
-- **Default browser**: the packaged app registers for http/https links and for HTML and PDF files
-- **Chrome extensions**: install from the Chrome Web Store with the store's own "Add to Chrome" button. Extension icons and popups appear in the sidebar. Extensions auto-update every 5 hours.
-- **Ad and tracker blocking** (Brave-style) via Ghostery's engine with the EasyList/EasyPrivacy lists. The shield in the URL bar shows how many requests were blocked on the current page.
-- **Tabs restore** after a restart
-- **Permission prompts** for camera, mic, location and notifications
-- Context menu: open link in new tab, copy, search selection, extension menu items, Inspect
+### Arc-style organization
+- **Spaces**: separate workspaces (Work, Study, Personal…), each with its own color, pinned tabs and tabs. Switch with the icons at the bottom of the sidebar or **⌃1–⌃9**. Right-click a space to rename it, change its icon or color, or delete it.
+- **Favorites**: an icon grid at the top of the sidebar. Drag a tab there, or right-click a tab → **Add to Favorites**.
+- **Pinned tabs and folders**: drag tabs into **Pinned**, or press **⇧⌘D**. Create folders with the folder button, nest them, and drag items between them. Closing a pinned tab keeps it pinned. **Back to Pinned URL** resets it.
+- **Today tabs**: everything else. **Clear** closes them all, and auto-archive closes tabs you haven't looked at in 12 hours (configurable). You can reopen them from Settings → Tabs.
+- **Command bar (⌘K)**: search open tabs, pinned items, bookmarks and history, open URLs, or run commands such as new space, split view, theme or copy URL.
+- **Split view**: right-click a tab → **Open in Split View**, or press **⌃⇧=**.
+- **Tab extras**: rename tabs (double-click), mute (speaker icon), duplicate, move to another space, copy URL (**⇧⌘C**).
+- **Collapsible sidebar**: **⌘S** hides it, and hovering the left edge slides it back over the page.
 
-## Wellbeing & footprint
+### Browsing
+- **Chrome extensions** from the Chrome Web Store, with buttons and popups in the sidebar
+- **Ad and tracker blocking** (Brave-style, EasyList/EasyPrivacy). You can turn it off in Settings.
+- **Smart URL bar** with suggestions from your bookmarks and history. Choose your **search engine** (Google, DuckDuckGo, Bing, Brave, Perplexity, Ecosia).
+- **Bookmarks** (**⌘D**), **PDF viewer**, **⌘O** to open files, and tabs that restore after a restart
+- **Import from Chrome, Brave, Arc, Edge, Vivaldi or Chromium**: bookmarks, history, passwords, cookies and extensions
+- **Password manager** with autofill, encrypted with your system keychain
+- **Light / dark mode**: System, Light or Dark in Settings, or **⇧⌘L**
+- **Typography**: Instrument Serif and Inter, bundled with the app
+- **Default browser** support for http/https links, HTML and PDF files
 
-Open it with the **Today** button at the bottom of the sidebar, **⌘Y**, or `valkyrie://wellbeing`.
+### Wellbeing dashboard (new tab page)
+Every new tab shows:
+- Greeting, clock and search
+- Favorites and your most-used sites as tiles
+- **Today** (with your daily-goal progress), **this week** vs last week, **daily average**, **streak** and **all-time** screen time
+- **Your year in browsing**: a GitHub-style heatmap of daily screen time for the last 12 months
+- **When you browse**: an hour-by-weekday heatmap for the last 90 days
+- **Most used sites** and **most visited pages** (30 days), plus **recently today**
 
-- **Screen time per site**: a second counts when a tab is the active tab of the focused window and you're not idle (60s without input), **or** when a tab is playing audio. That way a YouTube video you're watching still counts, but a tab left open overnight doesn't.
-- **Footprint**: every page you opened, when you opened it, and how long you spent on it. Each YouTube video is its own entry, and media that played is tagged.
-- **Day and Week views**: an hourly or daily chart, top sites, a comparison with the previous day, and a searchable list of pages.
-- **Private by design**: data lives only in `~/Library/Application Support/Valkyrie/wellbeing/YYYY-MM-DD.json` (plain JSON you own). You can pause tracking or delete a day or all data from the dashboard.
-- The new tab page shows today's total and your top 3 sites.
+The full **Wellbeing** page (**⌘Y**) has day and week views and a searchable footprint of every page.
+
+A second counts only when the tab is in front of you and you're active, or when it's playing audio. That way a 2-hour YouTube session shows up as 2 hours, but a tab left open overnight adds nothing. Data is stored only in `~/Library/Application Support/Valkyrie/wellbeing/` as plain JSON.
+
+### Settings
+General (default browser, startup, search engine) · Appearance (theme, sidebar, dashboard) · Spaces · Tabs (auto-archive and archived tabs) · Wellbeing (tracking, daily goal, idle time) · Privacy (ad blocking, clear browsing data) · Passwords · Import · Downloads · Shortcuts · About
 
 ## Shortcuts
 
+On Windows, use Ctrl instead of ⌘.
+
 | Keys | Action |
 |---|---|
+| ⌘K | Command bar |
 | ⌘T / ⌘W / ⇧⌘T | New tab / close tab / reopen closed tab |
 | ⌘L | Focus URL bar |
+| ⌘S | Toggle sidebar |
+| ⇧⌘L | Toggle light / dark mode |
+| ⌘D / ⇧⌘D | Bookmark page / pin tab |
+| ⇧⌘C | Copy URL |
+| ⌃⇧= / ⌃⇧- | Split view / exit split view |
+| ⌃1–⌃9, ⌃⌥← / → | Switch spaces |
+| ⌘1–⌘9, ⌃Tab, ⌥⌘↑/↓ | Switch tabs |
 | ⌘R / ⇧⌘R | Reload / hard reload |
 | ⌘[ / ⌘] | Back / forward |
-| ⌘1–⌘9, ⌃Tab, ⌥⌘↑/↓ | Switch tabs |
 | ⌘= / ⌘- / ⌘0 | Zoom |
-| ⌥⌘I | DevTools for the page |
-| ⌘N | New window |
-| ⌘Y | Wellbeing & activity |
-| ⌘S | Toggle sidebar |
-| ⌘D | Bookmark page |
+| ⌘Y | Wellbeing |
+| ⌘, | Settings |
 | ⌘O | Open file (PDF, HTML…) |
-| ⌘, | Settings & import |
+| ⌥⌘I | Developer tools |
+| ⌘N | New window |
 
 ## Layout
 
 ```
 src/
   main.js          main process: app setup, IPC, menu, permissions, ad blocking, valkyrie:// pages
-  window.js        a browser window: tabs, sidebar view, collapse/peek layout
-  stores.js        settings, bookmarks (JSON) and history (SQLite)
+  window.js        a browser window: tabs, spaces, pinned/favorites, split view, command bar, collapse/peek
+  stores.js        settings, spaces + pinned tree, archive, bookmarks (JSON) and history (SQLite)
   passwords.js     saved logins, encrypted with the OS keychain
   chrome-import.js import from Chrome/Brave/Arc/Edge/Vivaldi
   tracker.js       local activity tracker (time per site + footprint)
-  ui/              sidebar UI (index.html, styles.css, renderer.js, preload.js)
+  ui/              sidebar UI (index.html, styles.css, renderer.js, preload.js) and command bar (palette.*)
   pages/           built-in pages served at valkyrie://<folder>/
-    newtab/        new tab page
+    newtab/        new tab dashboard (screen-time history, heatmaps, top sites & pages)
     wellbeing/     wellbeing dashboard
     settings/      settings, import, passwords, default browser
-    assets/        shared icon + helpers
+    assets/        shared icon, fonts (Instrument Serif + Inter, OFL) and helpers
     preload.js     browser API on valkyrie:// pages, password autofill on websites
 assets/            app icon (icon.svg source, icon.png, icon.icns). Rebuild with `npm run icons`
 ```
@@ -107,7 +127,7 @@ assets/            app icon (icon.svg source, icon.png, icon.icns). Rebuild with
 ## Roadmap
 
 - To-do list in the sidebar and on the new tab page
-- Wellbeing: daily limits per site, focus mode, break reminders
+- Wellbeing: per-site daily limits, focus mode, break reminders
 - Accountability tracker: goals, streaks, weekly reports
 
 ## Website
