@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Settings</title>
+  <link rel="icon" href="valkyrie://assets/icon.svg" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <img src="valkyrie://assets/icon.svg" alt="" width="40" height="40" />
+      <div>
+        <h1>Settings</h1>
+        <p class="sub">Valkyrie keeps everything on this device.</p>
+      </div>
+    </header>
+
+    <section class="card" id="default">
+      <div class="row">
+        <div>
+          <h2>Default browser</h2>
+          <p id="default-status" class="muted">Checking…</p>
+        </div>
+        <button id="make-default" class="primary">Make Valkyrie default</button>
+      </div>
+      <p id="default-note" class="note" hidden></p>
+    </section>
+
+    <section class="card" id="import">
+      <h2>Import from another browser</h2>
+      <p class="muted">Bring over your bookmarks, history, saved passwords, logins (cookies) and extensions.</p>
+
+      <div class="grid">
+        <label>Browser
+          <select id="browser"></select>
+        </label>
+        <label>Profile
+          <select id="profile"></select>
+        </label>
+      </div>
+
+      <fieldset class="checks">
+        <label><input type="checkbox" value="bookmarks" checked /> Bookmarks</label>
+        <label><input type="checkbox" value="history" checked /> Browsing history</label>
+        <label><input type="checkbox" value="passwords" checked /> Saved passwords</label>
+        <label><input type="checkbox" value="cookies" checked /> Stay signed in (cookies)</label>
+        <label><input type="checkbox" value="extensions" checked /> Extensions</label>
+      </fieldset>
+
+      <p class="note">For passwords and cookies, macOS will ask you to allow access to the browser's
+        “Safe Storage” key in your Keychain. Click <b>Allow</b> (or <b>Always Allow</b>). Your passwords are
+        re-encrypted with Valkyrie's own Keychain key and never leave this Mac.</p>
+
+      <div class="actions">
+        <button id="run-import" class="primary">Import</button>
+        <span id="import-status" class="muted"></span>
+      </div>
+      <ul id="import-result" class="result" hidden></ul>
+      <p id="no-browsers" class="muted" hidden>No Chrome, Brave, Arc, Edge, Vivaldi or Chromium profile was found on this computer.</p>
+    </section>
+
+    <section class="card" id="passwords">
+      <div class="row">
+        <h2>Saved passwords <span class="count" id="pw-count"></span></h2>
+        <input id="pw-search" type="search" placeholder="Search sites or usernames" />
+      </div>
+      <p class="muted">Valkyrie offers to fill these when you click a login field, and asks before saving new ones.</p>
+      <table class="pw">
+        <thead><tr><th>Site</th><th>Username</th><th>Password</th><th></th></tr></thead>
+        <tbody id="pw-list"></tbody>
+      </table>
+      <p id="pw-empty" class="muted" hidden>No saved passwords yet.</p>
+    </section>
+
+    <section class="card">
+      <h2>Privacy</h2>
+      <div class="row">
+        <p class="muted" id="history-count"></p>
+        <button id="clear-history" class="danger">Clear browsing history</button>
+      </div>
+      <p class="muted">Screen time and footprint data are managed on the <a href="valkyrie://wellbeing/">Wellbeing page</a>.</p>
+    </section>
+  </main>
+
+  <script src="settings.js"></script>
+</body>
+</html>

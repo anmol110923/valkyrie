@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Wellbeing</title>
+  <link rel="icon" href="valkyrie://assets/icon.svg" />
+  <link rel="stylesheet" href="wellbeing.css" />
+</head>
+<body>
+  <main>
+    <header class="top">
+      <div class="brand">
+        <img src="valkyrie://assets/icon.svg" alt="" width="36" height="36" />
+        <div>
+          <h1>Wellbeing</h1>
+          <p class="sub">Your browsing footprint. Stored only on this device.</p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="seg" role="tablist">
+          <button data-range="day" class="on">Day</button>
+          <button data-range="week">Week</button>
+        </div>
+        <div class="datenav">
+          <button id="prev" aria-label="Previous">‹</button>
+          <span id="date-label"></span>
+          <button id="next" aria-label="Next">›</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><span class="label">Screen time</span><span class="value" id="s-total">–</span><span class="hint" id="s-compare"></span></div>
+      <div class="stat"><span class="label">Sites visited</span><span class="value" id="s-sites">–</span></div>
+      <div class="stat"><span class="label">Pages opened</span><span class="value" id="s-pages">–</span></div>
+      <div class="stat"><span class="label">Most used</span><span class="value small" id="s-top">–</span></div>
+    </section>
+
+    <section class="card">
+      <h2 id="chart-title">Activity by hour</h2>
+      <div id="chart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Time on sites</h2>
+      <ul id="sites" class="sites"></ul>
+      <p class="empty" id="sites-empty" hidden>No activity recorded for this period yet.</p>
+    </section>
+
+    <section class="card" id="footprint-card">
+      <div class="card-head">
+        <h2>Footprint</h2>
+        <input id="search" type="search" placeholder="Filter pages…" />
+      </div>
+      <table class="footprint">
+        <thead><tr><th>Time</th><th>Page</th><th class="num">Spent</th></tr></thead>
+        <tbody id="visits"></tbody>
+      </table>
+      <p class="empty" id="visits-empty" hidden>Nothing here.</p>
+    </section>
+
+    <footer class="privacy card">
+      <label class="toggle">
+        <input type="checkbox" id="enabled" />
+        <span>Track my activity</span>
+      </label>
+      <span class="path" id="data-path"></span>
+      <div class="danger">
+        <button id="clear-day">Delete this day</button>
+        <button id="clear-all">Delete all activity</button>
+      </div>
+    </footer>
+  </main>
+
+  <script src="valkyrie://assets/common.js"></script>
+  <script src="wellbeing.js"></script>
+</body>
+</html>
