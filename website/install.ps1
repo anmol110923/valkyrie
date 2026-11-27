@@ -46,7 +46,32 @@ Get-Process Valkyrie -ErrorAction SilentlyContinue | Stop-Process -ErrorAction S
 
 Write-Host '-> Installing...' -ForegroundColor Magenta
 Unblock-File $tmp
-Start-Process -FilePath $tmp -ArgumentList '/S' -Wait
+try {
+  Start-Process -FilePath $tmp -ArgumentList '/S' -Wait
+} catch {
+  Remove-Item $tmp -ErrorAction SilentlyContinue
+  if ($_.Exception.Message -notmatch 'Application Control|policy') { throw }
+  # Smart App Control (Windows 11) or an organisation's WDAC/AppLocker policy only allows
+  # code-signed apps. Valkyrie isn't code-signed yet, so explain instead of failing cryptically.
+  $sac = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -Name VerifiedAndReputablePolicyState -ErrorAction SilentlyContinue).VerifiedAndReputablePolicyState
+  Write-Host ''
+  Write-Host 'Windows blocked the installer.' -ForegroundColor Yellow
+  if ($sac -eq 1) {
+    Write-Host 'Smart App Control is on. It only allows code-signed apps, and Valkyrie for Windows'
+    Write-Host "isn't code-signed yet. Your download was fine (the checksum matched)."
+    Write-Host ''
+    Write-Host 'To install anyway, turn it off in: Windows Security > App & browser control >'
+    Write-Host 'Smart App Control settings > Off. Then run this command again.'
+    Write-Host 'Note: this lowers protection for the whole PC, and on some Windows versions it'
+    Write-Host "can't be turned back on without resetting Windows. It's your call."
+  } else {
+    Write-Host 'An application control policy on this PC (often set by a work or school IT team)'
+    Write-Host "only allows approved, code-signed apps. Valkyrie can't be installed here until it's code-signed."
+  }
+  Write-Host ''
+  Write-Host 'A code-signed Windows build is planned: https://tryvalkyrie.vercel.app/#g-faq'
+  return
+}
 Remove-Item $tmp -ErrorAction SilentlyContinue
 
 $exe = Join-Path $env:LOCALAPPDATA 'Programs\valkyrie\Valkyrie.exe'
