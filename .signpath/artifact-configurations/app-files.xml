@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignPath artifact configuration "app-files".
+  Input: a zip of electron-builder's dist/win-unpacked folder (uploaded by CI).
+  Signs every executable and DLL so Windows Smart App Control accepts the app itself,
+  not just the installer.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file-set>
+      <include path="Valkyrie.exe" />
+      <include path="**/*.exe" min-matches="0" max-matches="unbounded" />
+      <include path="**/*.dll" min-matches="0" max-matches="unbounded" />
+      <include path="**/*.node" min-matches="0" max-matches="unbounded" />
+      <for-each>
+        <authenticode-sign />
+      </for-each>
+    </pe-file-set>
+  </zip-file>
+</artifact-configuration>

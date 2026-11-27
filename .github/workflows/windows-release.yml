@@ -1,0 +1,171 @@
+# Builds the Windows installers on GitHub's Windows runners, code-signs them through
+# SignPath (free for open source via the SignPath Foundation) when configured, smoke-tests
+# a silent install, and publishes them to the GitHub release.
+#
+# Signing turns on automatically once these are set in the repo:
+#   secret   SIGNPATH_API_TOKEN
+#   variable SIGNPATH_ORGANIZATION_ID
+#   variable SIGNPATH_PROJECT_SLUG          (e.g. valkyrie)
+#   variable SIGNPATH_SIGNING_POLICY_SLUG   (e.g. release-signing)
+# Artifact configurations "app-files" and "installer" live in .signpath/.
+name: Windows release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build (e.g. v0.2.0)
+        required: true
+      upload:
+        description: Upload the installers to that release
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  TAG: ${{ github.event.release.tag_name || inputs.tag }}
+  UPLOAD: ${{ github.event_name == 'release' || inputs.upload }}
+  SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            unpacked: win-unpacked
+          - arch: arm64
+            unpacked: win-arm64-unpacked
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build app files
+        run: npx electron-builder --win dir --${{ matrix.arch }} --publish never
+
+      # ---- sign Valkyrie.exe and its DLLs ----
+      - name: Upload app files for signing
+        if: env.SIGN == 'true'
+        id: upload-app
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-files-${{ matrix.arch }}
+          path: dist/${{ matrix.unpacked }}/
+
+      - name: Sign app files (SignPath)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: app-files
+          github-artifact-id: ${{ steps.upload-app.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-app
+
+      - name: Use signed app files
+        if: env.SIGN == 'true'
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force "dist/${{ matrix.unpacked }}"
+          Move-Item signed-app "dist/${{ matrix.unpacked }}"
+
+      # ---- build + sign the installer ----
+      - name: Build installer
+        run: npx electron-builder --win nsis --${{ matrix.arch }} --prepackaged dist/${{ matrix.unpacked }} --publish never
+
+      - name: Collect installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out | Out-Null
+          Get-ChildItem dist -Filter "Valkyrie-*-win-${{ matrix.arch }}.exe" | Copy-Item -Destination out
+          Get-ChildItem out
+
+      - name: Upload installer for signing
+        if: env.SIGN == 'true'
+        id: upload-installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-unsigned-${{ matrix.arch }}
+          path: out/
+
+      - name: Sign installer (SignPath)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.upload-installer.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: out
+
+      # ---- smoke test: silent install exactly like install.ps1 does, then launch ----
+      - name: Smoke test (silent install + launch)
+        if: matrix.arch == 'x64'
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem out -Filter 'Valkyrie-*-win-x64.exe' | Select-Object -First 1
+          "Installer signature: " + (Get-AuthenticodeSignature $installer.FullName).Status
+          Start-Process -FilePath $installer.FullName -ArgumentList '/S' -Wait
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\valkyrie\Valkyrie.exe'
+          if (-not (Test-Path $exe)) { throw "Silent install did not create $exe" }
+          "App signature: " + (Get-AuthenticodeSignature $exe).Status
+          $p = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 15
+          if ($p.HasExited) { throw "Valkyrie exited early with code $($p.ExitCode)" }
+          "Valkyrie is running (pid $($p.Id))"
+          Get-Process Valkyrie | Stop-Process -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.arch }}
+          path: out/
+
+  publish:
+    name: Publish to release
+    needs: build
+    if: github.event_name == 'release' || inputs.upload
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installer-*
+          merge-multiple: true
+          path: out
+      - name: Upload installers and refresh SHA256SUMS.txt
+        run: |
+          set -euo pipefail
+          cd out
+          ls -la
+          gh release upload "$TAG" Valkyrie-*-win-*.exe --clobber --repo "$GITHUB_REPOSITORY"
+          gh release download "$TAG" --pattern SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" || touch SHA256SUMS.txt
+          for f in Valkyrie-*-win-*.exe; do
+            grep -v "  $f\$" SHA256SUMS.txt > sums.tmp || true
+            sha256sum "$f" >> sums.tmp
+            mv sums.tmp SHA256SUMS.txt
+          done
+          cat SHA256SUMS.txt
+          gh release upload "$TAG" SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"

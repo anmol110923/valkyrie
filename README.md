@@ -158,3 +158,25 @@ npx vercel deploy --prod
 When you publish a release, upload `dist/SHA256SUMS.txt` with the installers. The one-line installers refuse to install without it.
 
 `website/og.html` is the source of the link-preview image. Regenerate it with `npx electron scripts/build-og.js`.
+
+## License
+
+[MIT](LICENSE). Bundled fonts (Instrument Serif, Inter) are under the SIL Open Font License; see `src/pages/assets/fonts/`.
+
+## Code signing policy
+
+Free code signing for the Windows builds is provided by [SignPath.io](https://about.signpath.io), with the certificate issued by the [SignPath Foundation](https://signpath.org).
+
+- Windows installers are built and signed only by the [Windows release](.github/workflows/windows-release.yml) GitHub Actions workflow, from this repository's source at a release tag. The signing configurations live in [`.signpath/`](.signpath).
+- **Committers and reviewers:** [anmol110923](https://github.com/anmol110923)
+- **Approvers:** [anmol110923](https://github.com/anmol110923)
+
+### Privacy policy
+
+Valkyrie has no accounts, servers or analytics, and doesn't send your browsing history, screen-time data, bookmarks or passwords anywhere. Like any browser, it connects to the websites you visit. It also makes these network requests on its own:
+
+- downloading ad and tracker filter lists (Ghostery's prebuilt EasyList/EasyPrivacy engine)
+- installing and updating extensions you choose from the Chrome Web Store
+- importing from another browser only reads files on your own computer
+
+Wellbeing data, history, bookmarks and passwords are stored only on your device.
